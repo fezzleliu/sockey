@@ -4,14 +4,17 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "@types/node": "^17.0.21",
+    "node-ts": "^5.1.2",
     "nodemon": "^2.0.15",
-    "vite": "^2.8.6"
+    "typescript": "^4.6.2",
+    "vite": "^2.8.6",
+    "vite-plugin-node": "^0.0.17"
   },
-  "devDependencies": {},
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --host"
   },
   "repository": {
     "type": "git",
