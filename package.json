@@ -1,0 +1,27 @@
+{
+  "name": "sockey",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "nodemon": "^2.0.15",
+    "vite": "^2.8.6"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fezzleliu/sockey.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fezzleliu/sockey/issues"
+  },
+  "homepage": "https://github.com/fezzleliu/sockey#readme"
+}
