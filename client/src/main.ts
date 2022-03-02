@@ -1,8 +1,7 @@
 import './style.css'
 
-const app = document.querySelector<HTMLDivElement>('#app')!
+const canvas = document.createElement('canvas');
 
-app.innerHTML = `
-  <h1>Hello Vite!</h1>
-  <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
-`
+canvas.innerHTML = 'Your browser does not support html canvas';
+
+document.body.appendChild(canvas);
