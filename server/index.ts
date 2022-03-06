@@ -1,3 +1,4 @@
+// @ts-ignore
 import express from 'express';
 import { Server } from 'socket.io';
 
@@ -8,7 +9,7 @@ const server = app.listen(port, () => console.log('running on ' + port.toString(
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:8080",
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
   }
 });
 

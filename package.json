@@ -18,7 +18,7 @@
     "vite-plugin-node": "^0.0.17"
   },
   "scripts": {
-    "dev": "nodemon ./server/index.ts",
+    "dev": "vite --port 8080 --host & nodemon ./server/index.ts",
     "client": "vite --port 8080 --host",
     "server": "nodemon ./server/index.ts",
     "build": "vite build",
