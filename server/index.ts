@@ -1,21 +1,26 @@
-// @ts-ignore
-import express from 'express';
-import { Server } from 'socket.io';
+import Game from './Game';
+import io from './lib/server';
 
-const app = express();
-const port = process.env.PORT || 8081; // vite runs on 3000
-const server = app.listen(port, () => console.log('running on ' + port.toString()));
+let people = 0;
 
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:8080",
-    methods: ["GET", "POST"],
-  }
-});
+const games: Game[] = [];
+
+const onStart = () => {
+	emptyGame = new Game(onStart);
+}
+
+let emptyGame: Game = new Game(onStart);
+games.push(emptyGame);
 
 io.on('connection', (socket) => {
 	console.log('a user connected');
+	const player = emptyGame.addPlayer(socket, 'bob');
+	people++;
+	io.emit('people', people);
 	socket.on('disconnect', () => {
-		console.log('a user disconnected')
+		console.log('a user disconnected');
+		emptyGame.removePlayer(player);
+		people--;
+		io.emit('people', people);
 	});
 });

@@ -1,5 +1,4 @@
-import './style.css';
-import socket from './socketio';
+import './style.scss';
 import Game from './Game';
 
 const canvas = document.createElement('canvas');
