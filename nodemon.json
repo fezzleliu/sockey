@@ -1,5 +1,6 @@
 {
-  "execMap": {
-    "ts": "node --loader ts-node/esm"
-  }
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules"],
+  "watch": ["server"],
+  "exec": "node --experimental-specifier-resolution=node --loader ts-node/esm ./server/index.ts",
+  "ext": "ts"
 }
