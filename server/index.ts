@@ -1,26 +1,35 @@
+import Constants from './lib/Constants';
 import Game from './Game';
-import io from './lib/server';
-
-let people = 0;
+import io from './lib/Server';
 
 const games: Game[] = [];
 
-const onStart = () => {
-	emptyGame = new Game(onStart);
+const chars: string[] = ('abcdefghijklmnopqrstuvwxyz' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '1234567890-').split('');
+
+const generateId = (length: number): string => {
+	const id = new Array(length) // empty array
+		.fill(null) // array of nulls
+		.map(_ => Math.floor(Math.random() * chars.length)) // array of numbers each number is index of char in chars
+		.map(idx => chars[idx]) // array of chars
+		.join(''); // string of random chars
+	return games
+		.map(game => game.id)
+		.includes(id) ? generateId(length) : id;
+
 }
 
-let emptyGame: Game = new Game(onStart);
+const onStart = () => {
+	emptyGame = new Game(onStart, generateId(Constants.GAME.ID_LENGTH));
+}
+
+
+let emptyGame: Game = new Game(onStart, generateId(Constants.GAME.ID_LENGTH));
 games.push(emptyGame);
 
 io.on('connection', (socket) => {
-	console.log('a user connected');
 	const player = emptyGame.addPlayer(socket, 'bob');
-	people++;
-	io.emit('people', people);
 	socket.on('disconnect', () => {
 		console.log('a user disconnected');
 		emptyGame.removePlayer(player);
-		people--;
-		io.emit('people', people);
 	});
 });
