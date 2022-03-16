@@ -11,9 +11,10 @@ export interface InitData {
 
 // player data from server
 export interface InitPlayer {
-	x: number
-	y: number
-	id: string
-	team: number
-	name: string
+	x: number,
+	y: number,
+	id: string,
+	team: number,
+	name: string,
+	angle: number,
 }

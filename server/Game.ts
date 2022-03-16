@@ -77,9 +77,19 @@ class Game {
 			.includes(id) ? this.generateId(length) : id;
 	}
 
+	loop() {
+		this.players.forEach(player => {
+			player.update();
+		});
+
+		io.to(this.id).emit('update', this.players.map(player => player.getData()));
+	}
+
 	start() {
 		this.onStart();
 		io.to(this.id).emit('start', this.players.map(player => player.getData()));
+
+		setInterval(this.loop.bind(this), 1000 / Constants.GAME.FPS);
 	}
 
 	removePlayer(player: Player) {

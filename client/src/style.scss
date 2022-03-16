@@ -49,6 +49,11 @@
 	display: none;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
+
+	canvas {
+		border: 3px solid black;
+	}
 }
 
 #game.active {

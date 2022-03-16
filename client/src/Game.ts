@@ -10,6 +10,8 @@ class Game {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
 	scale: number;
+	mousePos: { x: number; y: number; };
+	movement: { key: boolean; mouse: boolean; };
 
 	constructor() {
 		console.log('game initalizing');
@@ -84,7 +86,7 @@ class Game {
 			canvas.height = height;
 
 			this.scale = canvas.width / this.data.board.width;
-		}
+		};
 
 		window.addEventListener('resize', resizeCanvas);
 		resizeCanvas();
@@ -92,7 +94,60 @@ class Game {
 		// bring game element to top
 		document.getElementById('game').classList.add('active');
 
+		// listen for updates server side
+		socket.on('update', this.onServerUpdate.bind(this));
+
+		// start main game loop
 		this.startGameLoop();
+
+		this.createEventBindings();
+
+		this.mousePos = {
+			x: 0,
+			y: 0,
+		};
+
+		this.movement = {
+			key: false,
+			mouse: false,
+		};
+	}
+
+	createEventBindings() {
+		// mouse movement for angle changes and stuff
+		window.addEventListener('mousemove', ({ clientX, clientY }) => {
+			const { x: canvasX, y: canvasY } = this.canvas.getBoundingClientRect();
+			const mouseX = clientX - canvasX, mouseY = clientY - canvasY;
+			const realX = mouseX / this.scale, realY = mouseY / this.scale;
+
+			const angle = Math.atan2(this.me.y - realY, this.me.x - realX);
+
+			socket.emit('angle', angle);
+		});
+
+		window.addEventListener('keydown', ({ key, repeat }) => {
+			if (!repeat && key === ' ') {
+				this.movement.key = true;
+				this.updateMovement();
+			}
+		});
+
+		window.addEventListener('keyup', ({ key }) => {
+			if (key === ' ') {
+				this.movement.key = false;
+				this.updateMovement();
+			}
+		});
+
+		window.addEventListener('mousedown', () => {
+			this.movement.mouse = true;
+			this.updateMovement();
+		});
+
+		window.addEventListener('mouseup', () => {
+			this.movement.mouse = false;
+			this.updateMovement();
+		});
 	}
 
 	maintainAspectMax(aspect: number, { width, height }: { width: number; height: number }) {
@@ -113,6 +168,10 @@ class Game {
 		}
 	}
 
+	updateMovement() {
+		socket.emit('movement', this.movement.key || this.movement.mouse);
+	}
+
 	onServerUpdate(players: InitPlayer[]) {
 		players.forEach(playerData => {
 			const player = this.players.find(({ id }) => id === playerData.id);
@@ -128,7 +187,9 @@ class Game {
 
 	gameLoop() {
 		requestAnimationFrame(this.gameLoop.bind(this));
-		this.players.forEach(player => player.draw(this.ctx, this.scale, this.me.team));
+
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		this.players.forEach(player => player.draw(this.ctx, this.scale, this.me));
 	}
 }
 
