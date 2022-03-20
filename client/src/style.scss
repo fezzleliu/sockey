@@ -38,3 +38,24 @@
 		}
 	}
 }
+
+
+#game {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+
+	canvas {
+		border: 3px solid black;
+	}
+}
+
+#game.active {
+	display: flex;
+}
