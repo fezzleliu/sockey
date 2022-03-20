@@ -61,7 +61,7 @@ class Game {
 			console.log('starting game');
 			this.start();
 		}
-
+		console.log('added player ' + name);
 
 		return player;
 	}

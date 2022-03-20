@@ -58,6 +58,7 @@ class Player {
 			name: this.name,
 			angle: this.angle,
 		}
+
 	}
 }
 

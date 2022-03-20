@@ -2,6 +2,18 @@ import socket from './socketio';
 import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 
+// define interfaces
+
+// inital data from server
+interface InitData {
+	board: {
+		width: number,
+		height: number,
+		goalHeight: number,
+	},
+	players: number,
+}
+
 class Game {
 	
 	data: InitData
