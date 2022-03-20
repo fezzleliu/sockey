@@ -13,8 +13,13 @@ const io = new Server(server, {
   }
 });
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
 	console.log('a user connected');
+
+  socket.on('init', name => {
+    console.log(name);
+    socket.emit("init", '0');
+  })
 	socket.on('disconnect', () => {
 		console.log('a user disconnected')
 	});
