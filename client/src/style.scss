@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap');
+
 .waiting {
 	position: fixed;
 	top: 0;
@@ -58,4 +60,21 @@
 
 #game.active {
 	display: flex;
+}
+
+.points {
+	width: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	display: flex;
+	font-size: 30px;
+	font-weight: bold;
+	justify-content: center;
+	align-items: center;
+	font-family: "Comfortaa";
+
+	.spacer {
+		margin: 0 5px;
+	}
 }
