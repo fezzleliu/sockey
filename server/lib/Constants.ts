@@ -11,7 +11,8 @@ const Constants = {
 		GOAL: {
 			HEIGHT: 1 / 2,
 			WIDTH: 10,
-		}
+		},
+		TIME_LENGTH: 3 * 60, // in seconds (3 minutes)
 	},
 	PLAYER: {
 		RADIUS: 15, // radius of player

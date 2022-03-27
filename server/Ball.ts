@@ -92,8 +92,12 @@ class Ball extends Point{
 				) {
 					// if it is in the goal
 					if (this.x + this.radius < 0 || this.x - this.radius >= Constants.GAME.WIDTH) {
+						// tell everyone there was a score
+						this.onScore();
+
 						// reset the ball
 						console.log('goal');
+
 						this.lastGrabber = null;
 						this.x = Constants.GAME.WIDTH / 2;
 						this.y = Constants.GAME.HEIGHT / 2;

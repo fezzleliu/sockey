@@ -3,6 +3,7 @@ import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 import Constants from '../../server/lib/Constants';
 import { RGB } from './lib/utils';
+import { constant } from 'lodash';
 
 class Game {
 	
@@ -16,6 +17,7 @@ class Game {
 	movement: { key: boolean; mouse: boolean; left: boolean; right: boolean; };
 	ball: { x: number; y: number; charge: number, color: RGB; charged: string; };
 	points: number[];
+	startTime: number;
 
 	constructor() {
 		console.log('game initalizing');
@@ -39,6 +41,8 @@ class Game {
 			color: new RGB('#808080'),
 			charged: '#FFFF00',
 		}
+
+		this.startTime = 0;
 		
 		socket.on('people', this.onPerson.bind(this));
 
@@ -130,6 +134,8 @@ class Game {
 		};
 
 		this.points = [0, 0];
+
+		this.startTime = performance ? performance.now() : Date.now();
 	}
 
 	createEventBindings() {
@@ -215,8 +221,11 @@ class Game {
 		this.ball.y = ball.y;
 		this.ball.charge = ball.charge;
 
-		if (this.points !== points) {
+		if (this.points[0] !== points[0] || this.points[1] !== points[1]) {
 			this.points = points;
+			console.log(points)
+			document.querySelector('.points .left').innerHTML = points[0].toString();
+			document.querySelector('.points .right').innerHTML = points[1].toString();
 		}
 	}
 
@@ -267,6 +276,20 @@ class Game {
 			const newAngle = this.me.angle + (this.movement.left ? -1 : 1) * Constants.PLAYER.TURN_SPEED;
 			socket.emit('angle', newAngle);
 		}
+
+		// update timer on the top
+		const currentTime = performance ? performance.now() : Date.now();
+		const elapsedTime = (currentTime - this.startTime) / 1000;
+
+		const minutesElapsed = Math.floor(elapsedTime / 60);
+		const minutesLeft = Math.floor(Constants.GAME.TIME_LENGTH / 60) - minutesElapsed - 1;
+
+		const secondsElapsed = elapsedTime - minutesElapsed / 60;
+		const secondsLeft = Constants.GAME.TIME_LENGTH - minutesLeft * 60 - secondsElapsed;
+
+		const timeLeft = minutesLeft.toString() + ':' + secondsLeft.toFixed(1).padStart(4, '0')
+
+		document.querySelector('.points .timer').innerHTML = timeLeft;
 	}
 }
 
