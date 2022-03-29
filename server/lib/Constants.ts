@@ -12,7 +12,8 @@ const Constants = {
 			HEIGHT: 1 / 2,
 			WIDTH: 10,
 		},
-		TIME_LENGTH: 3 * 60, // in seconds (3 minutes)
+		TIME_LENGTH: 3 * 60 + 3, // in seconds (3 minutes + 3 seconds)
+		BEGIN_WAIT: 3, // in seconds (3 seconds)
 	},
 	PLAYER: {
 		RADIUS: 15, // radius of player

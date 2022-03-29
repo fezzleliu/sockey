@@ -3,7 +3,6 @@ import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 import Constants from '../../server/lib/Constants';
 import { RGB } from './lib/utils';
-import { constant } from 'lodash';
 
 class Game {
 	
@@ -119,7 +118,7 @@ class Game {
 		// start main game loop
 		this.startGameLoop();
 
-		this.createEventBindings();
+		setTimeout(this.createEventBindings.bind(this), Constants.GAME.BEGIN_WAIT * 1000);
 
 		this.mousePos = {
 			x: 0,
@@ -136,6 +135,8 @@ class Game {
 		this.points = [0, 0];
 
 		this.startTime = performance ? performance.now() : Date.now();
+
+		document.getElementById('countdown').classList.add('countdown');
 	}
 
 	createEventBindings() {
@@ -279,7 +280,7 @@ class Game {
 
 		// update timer on the top
 		const currentTime = performance ? performance.now() : Date.now();
-		const elapsedTime = (currentTime - this.startTime) / 1000;
+		const elapsedTime = Math.min(Math.max((currentTime - this.startTime) / 1000, Constants.GAME.BEGIN_WAIT), Constants.GAME.TIME_LENGTH);
 
 		const minutesElapsed = Math.floor(elapsedTime / 60);
 		const minutesLeft = Math.floor(Constants.GAME.TIME_LENGTH / 60) - minutesElapsed - 1;

@@ -93,9 +93,9 @@ class Game {
 
 	onPoint() {
 		if (this.ball.x >= Constants.GAME.WIDTH / 2) {
-			this.points[1]++;
-		} else {
 			this.points[0]++;
+		} else {
+			this.points[1]++;
 		}
 	}
 
