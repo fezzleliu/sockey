@@ -18,6 +18,7 @@ class Game {
 	points: number[];
 	startTime: number;
 
+
 	constructor() {
 		console.log('game initalizing');
 
