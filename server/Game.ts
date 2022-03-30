@@ -1,6 +1,7 @@
 import { range } from 'lodash-es';
 import { Socket } from 'socket.io';
 import Player from './Player';
+import Ball from './Ball';
 import Constants from './lib/Constants';
 import io from './lib/Server';
 
@@ -11,6 +12,9 @@ class Game {
 
 	onStart: () => void
 	id: string
+	ball: any;
+	started: boolean;
+	points: number[];
 
 	constructor(onStart: () => void, id: string) {
 		this.teams = Array(Constants.GAME.NUM_TEAMS).fill(null).map(() => []);
@@ -18,6 +22,12 @@ class Game {
 		this.onStart = onStart;
 
 		this.id = id;
+
+		this.ball = new Ball(this.onPoint.bind(this));
+
+		this.started = false;
+
+		this.points = [0, 0];
 	}
 	
 	get players() {
@@ -61,9 +71,32 @@ class Game {
 			console.log('starting game');
 			this.start();
 		}
-		console.log('added player ' + name);
+
+		socket.on('reload', () => {
+			io.to(this.id).emit('reload');
+		});
+
+		socket.on('charge', () => {
+			if (this.ball.grabber == player) {
+				this.ball.charging = true;
+			}
+		});
+
+		socket.on('shoot', () => {
+			if (this.ball.grabber == player) {
+				this.ball.shoot(player);
+			}
+		});
 
 		return player;
+	}
+
+	onPoint() {
+		if (this.ball.x >= Constants.GAME.WIDTH / 2) {
+			this.points[0]++;
+		} else {
+			this.points[1]++;
+		}
 	}
 
 	generateId(length: number): string {
@@ -82,10 +115,14 @@ class Game {
 			player.update();
 		});
 
-		io.to(this.id).emit('update', this.players.map(player => player.getData()));
+		this.ball.update(this.players);
+
+		io.to(this.id).emit('update', this.players.map(player => player.getData()), this.ball.getData(), this.points);
 	}
 
 	start() {
+		this.started = true;
+		
 		this.onStart();
 		io.to(this.id).emit('start', this.players.map(player => player.getData()));
 

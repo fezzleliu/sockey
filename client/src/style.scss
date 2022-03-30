@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Space+Mono:wght@700&display=swap');
+
 .waiting {
 	position: fixed;
 	top: 0;
@@ -9,6 +11,7 @@
 	justify-content: center;
 	align-items: center;
 	font-size: 50px;
+	z-index: 100;
 
 	.dots {
 		position: relative;
@@ -58,4 +61,122 @@
 
 #game.active {
 	display: flex;
+}
+
+.points {
+	width: 100%;
+	position: fixed;
+	left: 0;
+	top: 0;
+	display: flex;
+	font-size: 30px;
+	font-weight: bold;
+	justify-content: center;
+	align-items: center;
+	font-family: "Comfortaa";
+	color: white;
+	user-select: none;
+
+	.left {
+		background: blue;
+		padding: 6px 10px;
+		border-radius: 10px 0 0 10px;
+	}
+
+	.right {
+		background: red;
+		padding: 6px 10px;
+		border-radius: 0 10px 10px 0;
+	}
+
+	.timer {
+		background-color: grey;
+		padding: 0px 10px;
+		font-family: "Space Mono", monospace;
+	}
+}
+
+.countdown {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	font-size: 50px;
+	font-family: "Comfortaa";
+	
+	animation: countdown-scale 3s linear forwards
+}
+
+.countdown::after {
+	content: '3';
+
+	animation: countdown 3s linear forwards;
+}
+
+@keyframes countdown {
+	0% {
+		content: '3';
+		opacity: 1;
+	}
+
+	33.2% {
+		content: '3';
+		opacity: 0;
+	}
+
+	33.3% {
+		content: '2';
+		opacity: 1;
+	}
+
+	66.5% {
+		content: '2';
+		opacity: 0;
+	}
+
+	66.6% {
+		content: '1';
+		opacity: 1;
+	}
+
+	99.9% {
+		content: '1';
+		opacity: 1;
+	}
+
+	100% {
+		content: '0';
+		opacity: 0;
+	}
+}
+
+@keyframes countdown-scale {
+	0% {
+		transform: translate(-50%, -50%) scale(0);
+	}
+
+	33.2% {
+		transform: translate(-50%, -50%) scale(2);
+	}
+
+	33.3% {
+		transform: translate(-50%, -50%) scale(0);
+	}
+
+	66.5% {
+		transform: translate(-50%, -50%) scale(2);
+	}
+
+	66.6% {
+		transform: translate(-50%, -50%) scale(0);
+	}
+
+	99.9% {
+		transform: translate(-50%, -50%) scale(2);
+	}
+
+	100% {
+		transform: translate(-50%, -50%) scale(0);
+	}
 }
