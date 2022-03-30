@@ -16,4 +16,3 @@ if (import.meta.env.DEV) {
 		}
 	})
 }
-const game = new Game();
