@@ -54,6 +54,15 @@ class Game {
 		this.teams[teamNum].push(player);
 		console.log('added player ' + name);
 
+		// if they don't get the id send it to them again
+		const interval = setInterval(() => {
+			if (!player.ready) {
+				io.to(socket.id).emit('id', player.id);
+			} else {
+				clearInterval(interval);
+			}
+		}, 1000);
+
 		io.to(this.id).emit('people', this.players.length);
 		console.log('emiting id, ' + player.id);
 		io.to(socket.id).emit('id', player.id);

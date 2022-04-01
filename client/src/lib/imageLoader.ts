@@ -44,7 +44,7 @@ async function loadImages(images: { [key: string]: string; }, onProgress = (load
 
   const imgs = Object.keys(images).map((key, idx) =>
     loadImage(key, images[key], (loaded, total) => {
-      console.log(key, (loaded / total) * 100);
+      // console.log(key, (loaded / total) * 100);
 			loadedNumbers[idx] = loaded;
 			totalNumbers[idx] = total;
 			onProgress(loadedNumbers.reduce((a, b) => a + b), totalNumbers.reduce((a, b) => a + b));

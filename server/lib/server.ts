@@ -1,5 +1,6 @@
-// @ts-ignore
+import { exec } from 'child_process';
 import express from 'express';
+import path from 'path';
 import { Server } from 'socket.io';
 
 const app = express();
@@ -14,4 +15,14 @@ const io = new Server(server, {
   }
 });
 
+if (process.argv.includes('-host')) {
+	exec('npm run build', (_, stdout, __) => {
+		console.log(stdout);
+		console.log(path.join(__dirname, '../client/dist/index.html'));
+		app.use(express.static(path.join(__dirname, '../client/dist')));
+		console.log('hosting');
+	});
+}
+
 export default io;
+export { app };

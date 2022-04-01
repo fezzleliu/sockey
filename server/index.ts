@@ -27,7 +27,7 @@ let emptyGame: Game = new Game(onStart, generateId(Constants.GAME.ID_LENGTH));
 games.push(emptyGame);
 
 io.on('connection', (socket) => {
-	const player = emptyGame.addPlayer(socket, 'bob'); 
+	const player = emptyGame.addPlayer(socket, 'bob');
 
 	socket.on('disconnect', () => {
 		console.log('a user disconnected');
