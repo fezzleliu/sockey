@@ -1,8 +1,12 @@
 import './style.scss';
 import Game from './Game';
-import socket from './socketio';
+import socket from './lib/socketio';
+import loadImages from './lib/imageLoader';
+// @ts-ignore
+import bigImage from '../assets/reallybigimage.png';
+// @ts-ignore
+import otherImage from '../assets/otherbigimage.png';
 
-const game = new Game();
 
 // @ts-ignore
 if (import.meta.env.DEV) {
@@ -16,3 +20,16 @@ if (import.meta.env.DEV) {
 		}
 	});
 }
+// load images
+const images = {
+	big: bigImage,
+	otherBig: otherImage,
+};
+loadImages(
+	images,
+	(loaded, total) => {
+		console.log('loaded ', loaded, ' of ', total, 'bytes, or ', loaded / total * 100, '%');
+	},
+).then(() => {
+	const game = new Game();
+});

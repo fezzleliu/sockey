@@ -1,4 +1,4 @@
-import socket from './socketio';
+import socket from './lib/socketio';
 import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 import Constants from '../../server/lib/Constants';
@@ -15,7 +15,7 @@ class Game {
 	mousePos: { x: number; y: number; };
 	movement: { key: boolean; mouse: boolean; left: boolean; right: boolean; };
 	ball: { x: number; y: number; charge: number, color: RGB; charged: string; };
-	points: number[];
+	points: [number, number];
 	startTime: number;
 
 
@@ -68,6 +68,7 @@ class Game {
 
 			// save the you player into the Game.me
 			if (playerData.id === this.data.id) {
+				console.log('its me!')
 				this.me = player;
 			}
 		});
@@ -142,7 +143,7 @@ class Game {
 
 	createEventBindings() {
 		// mouse movement for angle changes and stuff
-		window.addEventListener('mousemove', ({ clientX, clientY }) => {
+		window.addEventListener('mousemove', ({ clientX, clientY }): void => {
 			const { x: canvasX, y: canvasY } = this.canvas.getBoundingClientRect();
 			const mouseX = clientX - canvasX, mouseY = clientY - canvasY;
 			const realX = mouseX / this.scale, realY = mouseY / this.scale;
@@ -152,7 +153,7 @@ class Game {
 			socket.emit('angle', angle);
 		});
 
-		window.addEventListener('keydown', ({ key, repeat }) => {
+		window.addEventListener('keydown', ({ key, repeat }): void => {
 			if (!repeat && ['w', 'Up', 'ArrowUp'].includes(key)) {
 				this.movement.key = true;
 				this.updateMovement();
@@ -165,7 +166,7 @@ class Game {
 			}
 		});
 
-		window.addEventListener('keyup', ({ key }) => {
+		window.addEventListener('keyup', ({ key }): void => {
 			if (['w', 'Up', 'ArrowUp'].includes(key)) {
 				this.movement.key = false;
 				this.updateMovement();
