@@ -1,6 +1,6 @@
 import './style.scss';
 import Game from './Game';
-import socket from './lib/socketio';
+import connect from './lib/socketio';
 import loadImages from './lib/imageLoader';
 // @ts-ignore
 import bigImage from '../assets/reallybigimage.png';
@@ -8,18 +8,7 @@ import bigImage from '../assets/reallybigimage.png';
 import otherImage from '../assets/otherbigimage.png';
 
 
-// @ts-ignore
-if (import.meta.env.DEV) {
-	socket.on('reload', () => {
-		location.reload();
-	});
 
-	window.addEventListener('keydown', ({ key }) => {
-		if (key === 'r') {
-			socket.emit('reload');
-		}
-	});
-}
 // load images
 const images = {
 	big: bigImage,
@@ -30,6 +19,21 @@ loadImages(
 	(loaded, total) => {
 		console.log('loaded ', loaded, ' of ', total, 'bytes, or ', loaded / total * 100, '%');
 	},
-).then(() => {
+).then(async (images) => {
+	const socket = await connect();
+	// @ts-ignore
+	if (import.meta.env.DEV) {
+		socket.on('reload', () => {
+			location.reload();
+		});
+
+		window.addEventListener('keydown', ({ key }) => {
+			if (key === 'r') {
+				socket.emit('reload');
+			}
+		});
+	}
+
+	
 	const game = new Game();
 });

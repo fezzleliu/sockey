@@ -50,27 +50,13 @@ class Game {
 		socket.join(this.id);
 
 		// add them to the proper team
-		const player : Player = new Player(socket, name, teamNum, this.teams[teamNum].length, this.generateId(Constants.PLAYER.ID_LENGTH));
+		const player : Player = new Player(socket, name, teamNum, this.teams[teamNum].length, this.generateId(Constants.PLAYER.ID_LENGTH), this.onReady.bind(this));
 		this.teams[teamNum].push(player);
 		console.log('added player ' + name);
 
 		io.to(this.id).emit('people', this.players.length);
+		console.log('emiting id, ' + player.id);
 		io.to(socket.id).emit('id', player.id);
-
-		// check if ready to start
-		let teamsFull : boolean = true;
-		this.teams.forEach(team => {
-			if (team.length < Constants.GAME.TEAM_SIZE) {
-				teamsFull = false;
-			} else {
-			}
-		});
-
-		if (teamsFull) {
-			console.log(this.teams);
-			console.log('starting game');
-			this.start();
-		}
 
 		socket.on('reload', () => {
 			io.to(this.id).emit('reload');
@@ -118,6 +104,25 @@ class Game {
 		this.ball.update(this.players);
 
 		io.to(this.id).emit('update', this.players.map(player => player.getData()), this.ball.getData(), this.points);
+	}
+
+	onReady() {
+		// check if ready to start
+		let teamsFull : boolean = true;
+		this.teams.forEach(team => {
+			if (team.length < Constants.GAME.TEAM_SIZE) {
+				teamsFull = false;
+			} else {
+			}
+		});
+
+		if (teamsFull) {
+			if (this.players.every(player => player.ready)) {
+				console.log(this.teams);
+				console.log('starting game');
+				this.start();
+			}
+		}
 	}
 
 	start() {

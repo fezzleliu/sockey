@@ -1,4 +1,4 @@
-import socket from './lib/socketio';
+import { socket } from './lib/socketio';
 import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 import Constants from '../../server/lib/Constants';
@@ -49,6 +49,9 @@ class Game {
 		socket.on('id', (id: string) => {
 			this.data.id = id;
 			console.log('id:', this.data.id);
+			console.log('connected to server');
+
+			socket.emit('ready');
 		});
 
 		socket.on('start', this.onStart.bind(this));
@@ -82,6 +85,7 @@ class Game {
 	}
 
 	start() {
+		console.log(this.data.id);
 		// clear game div
 		document.getElementById('game').innerHTML = '';
 
