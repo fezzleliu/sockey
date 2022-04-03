@@ -11,8 +11,10 @@ class Player extends Point {
 
 	angle: number
 	isMoving: boolean;
+	onReady: () => void;
+	ready: boolean;
 
-	constructor(socket: Socket, name: string, team: number, playerIndex: number, id: string) {
+	constructor(socket: Socket, name: string, team: number, playerIndex: number, id: string, onReady: () => void) {
 		const x = Constants.GAME.WIDTH / 2 + (Constants.GAME.START_X_SPACE + Constants.PLAYER.RADIUS ) * ( team === 1 ? 1 : -1 ),
 			y = Constants.GAME.HEIGHT / 2 + (Math.ceil(Constants.GAME.TEAM_SIZE / 2) - playerIndex - 1) * (Constants.GAME.START_Y_SPACE + Constants.PLAYER.RADIUS * 2);
 		
@@ -27,12 +29,21 @@ class Player extends Point {
 		this.isMoving = false;
 
 		this.createSocketListeners();
+
+		this.onReady = onReady;
+
+		this.ready = false;
 	}
 
 	createSocketListeners() {
 		this.socket.on('angle', (angle: number) => this.angle = angle);
 
 		this.socket.on('movement', (isMoving: boolean) => this.isMoving = isMoving);
+
+		this.socket.on('ready', () => {
+			this.ready = true;
+			this.onReady();
+		})
 	}
 
 	update() {

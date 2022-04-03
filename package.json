@@ -25,7 +25,8 @@
     "client": "vite --port 8080 --host",
     "server": "nodemon ./server/index.ts",
     "build": "vite build",
-    "preview": "vite preview --host"
+    "preview": "vite preview --host",
+		"start": "node --experimental-specifier-resolution=node --loader ts-node/esm ./server/index.ts -host"
   },
   "repository": {
     "type": "git",

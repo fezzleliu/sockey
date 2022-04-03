@@ -1,4 +1,4 @@
-import socket from './socketio';
+import { socket } from './lib/socketio';
 import { InitData, InitPlayer } from './lib/types';
 import Player from './Player';
 import Constants from '../../server/lib/Constants';
@@ -15,11 +15,11 @@ class Game {
 	mousePos: { x: number; y: number; };
 	movement: { key: boolean; mouse: boolean; left: boolean; right: boolean; };
 	ball: { x: number; y: number; charge: number, color: RGB; charged: string; };
-	points: number[];
+	points: [number, number];
 	startTime: number;
 
 
-	constructor() {
+	constructor(images: { [key: string]: HTMLImageElement }) {
 		console.log('game initalizing');
 
 		this.data = {
@@ -49,9 +49,29 @@ class Game {
 		socket.on('id', (id: string) => {
 			this.data.id = id;
 			console.log('id:', this.data.id);
+			console.log('connected to server');
+
+			socket.emit('ready');
 		});
 
 		socket.on('start', this.onStart.bind(this));
+
+		this.addSmashImages(images);
+	}
+
+	addSmashImages(images: { [key: string]: HTMLImageElement }) {
+		const leftContainers = document.querySelectorAll('#smash .left .rect .player .img');
+		const rightContainers = document.querySelectorAll('#smash .right .rect .player .img');
+		console.log(leftContainers);
+		console.log(rightContainers);
+
+		leftContainers.forEach(container => {
+			container.appendChild(images.bluePlayer.cloneNode(true));
+		});
+
+		rightContainers.forEach(container => {
+			container.appendChild(images.redPlayer.cloneNode(true));
+		})
 	}
 
 	onPerson(people: number) {
@@ -68,6 +88,7 @@ class Game {
 
 			// save the you player into the Game.me
 			if (playerData.id === this.data.id) {
+				console.log('its me!')
 				this.me = player;
 			}
 		});
@@ -81,6 +102,7 @@ class Game {
 	}
 
 	start() {
+		console.log(this.data.id);
 		// clear game div
 		document.getElementById('game').innerHTML = '';
 
@@ -137,12 +159,24 @@ class Game {
 
 		this.startTime = performance ? performance.now() : Date.now();
 
-		document.getElementById('countdown').classList.add('countdown');
+		// starting animationa
+		document.querySelector('#smash').classList.remove('hidden');
+		document.querySelector('#smash').classList.add('show');
+		setTimeout(() => {
+			document.querySelector('#smash').classList.add('smash');
+		}, 50);
+		setTimeout(() => {
+			document.querySelector('#smash').classList.remove('show');
+			document.querySelector('#smash').classList.remove('smash');
+			document.querySelector('#smash').classList.add('hide');
+
+			document.querySelector('#countdown').classList.add('countdown');
+		}, 2000);
 	}
 
 	createEventBindings() {
 		// mouse movement for angle changes and stuff
-		window.addEventListener('mousemove', ({ clientX, clientY }) => {
+		window.addEventListener('mousemove', ({ clientX, clientY }): void => {
 			const { x: canvasX, y: canvasY } = this.canvas.getBoundingClientRect();
 			const mouseX = clientX - canvasX, mouseY = clientY - canvasY;
 			const realX = mouseX / this.scale, realY = mouseY / this.scale;
@@ -152,7 +186,7 @@ class Game {
 			socket.emit('angle', angle);
 		});
 
-		window.addEventListener('keydown', ({ key, repeat }) => {
+		window.addEventListener('keydown', ({ key, repeat }): void => {
 			if (!repeat && ['w', 'Up', 'ArrowUp'].includes(key)) {
 				this.movement.key = true;
 				this.updateMovement();
@@ -165,7 +199,7 @@ class Game {
 			}
 		});
 
-		window.addEventListener('keyup', ({ key }) => {
+		window.addEventListener('keyup', ({ key }): void => {
 			if (['w', 'Up', 'ArrowUp'].includes(key)) {
 				this.movement.key = false;
 				this.updateMovement();
