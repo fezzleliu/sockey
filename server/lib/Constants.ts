@@ -9,10 +9,10 @@ const Constants = {
 		ID_LENGTH: 15,
 		FPS: 60,
 		GOAL: {
-			HEIGHT: 1 / 2,
+			HEIGHT: 1 / 4,
 			WIDTH: 10,
 		},
-		TIME_LENGTH: 3 * 60 + 5, // in seconds (3 minutes + 3 seconds)
+		TIME_LENGTH: 3 * 60 + 5, // in seconds (3 minutes + 5 seconds)
 		BEGIN_WAIT: 5, // in seconds (5 seconds)
 	},
 	PLAYER: {
@@ -23,13 +23,13 @@ const Constants = {
 			RADIUS: 7,
 			ANGLE: Math.PI / 4, // in radians
 		},
-		SPEED: 7, // pixels per frame
-		TURN_SPEED: .1 // radians per frame
+		SPEED: 4.5, // pixels per frame
+		TURN_SPEED: .2 // radians per frame
 	},
 	BALL: {
 		RADIUS: 17,
 		GRAB_DISTANCE: 17, // the distance from the players hands to the center of the ball
-		FRICTION: .3,
+		FRICTION: .45,
 		MAX_CHARGE: 30,
 		CHARGE_RATE: .3,
 		DECHARGE_RATE: 5,
