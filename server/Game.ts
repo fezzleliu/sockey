@@ -116,6 +116,8 @@ class Game {
 	}
 
 	onReady() {
+		io.to(this.id).emit('people', this.players.length);
+		
 		// check if ready to start
 		let teamsFull : boolean = true;
 		this.teams.forEach(team => {
