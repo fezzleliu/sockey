@@ -19,7 +19,7 @@ class Game {
 	startTime: number;
 
 
-	constructor() {
+	constructor(images: { [key: string]: HTMLImageElement }) {
 		console.log('game initalizing');
 
 		this.data = {
@@ -55,6 +55,23 @@ class Game {
 		});
 
 		socket.on('start', this.onStart.bind(this));
+
+		this.addSmashImages(images);
+	}
+
+	addSmashImages(images: { [key: string]: HTMLImageElement }) {
+		const leftContainers = document.querySelectorAll('#smash .left .rect .player .img');
+		const rightContainers = document.querySelectorAll('#smash .right .rect .player .img');
+		console.log(leftContainers);
+		console.log(rightContainers);
+
+		leftContainers.forEach(container => {
+			container.appendChild(images.bluePlayer.cloneNode(true));
+		});
+
+		rightContainers.forEach(container => {
+			container.appendChild(images.redPlayer.cloneNode(true));
+		})
 	}
 
 	onPerson(people: number) {
@@ -142,7 +159,19 @@ class Game {
 
 		this.startTime = performance ? performance.now() : Date.now();
 
-		document.getElementById('countdown').classList.add('countdown');
+		// starting animationa
+		document.querySelector('#smash').classList.remove('hidden');
+		document.querySelector('#smash').classList.add('show');
+		setTimeout(() => {
+			document.querySelector('#smash').classList.add('smash');
+		}, 50);
+		setTimeout(() => {
+			document.querySelector('#smash').classList.remove('show');
+			document.querySelector('#smash').classList.remove('smash');
+			document.querySelector('#smash').classList.add('hide');
+
+			document.querySelector('#countdown').classList.add('countdown');
+		}, 2000);
 	}
 
 	createEventBindings() {

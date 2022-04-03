@@ -3,16 +3,16 @@ import Game from './Game';
 import connect from './lib/socketio';
 import loadImages from './lib/imageLoader';
 // @ts-ignore
-import bigImage from '../assets/reallybigimage.png';
+import redPlayer from '../assets/player_red.png';
 // @ts-ignore
-import otherImage from '../assets/otherbigimage.png';
+import bluePlayer from '../assets/player_blue.png';
 
 
 
 // load images
 const images = {
-	big: bigImage,
-	otherBig: otherImage,
+	redPlayer: redPlayer,
+	bluePlayer: bluePlayer,
 };
 loadImages(
 	images,
@@ -35,5 +35,5 @@ loadImages(
 	}
 
 	
-	const game = new Game();
+	const game = new Game(images);
 });

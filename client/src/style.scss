@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Space+Mono:wght@700&display=swap");
 
 .waiting {
@@ -190,6 +192,7 @@ $triangle-size: 100px;
   height: 100vh;
   background-color: rgba($color: #000000, $alpha: .5);
   z-index: 100;
+	user-select: none;
 
   display: flex;
   justify-content: center;
@@ -222,6 +225,9 @@ $triangle-size: 100px;
 				align-items: center;
 				flex-direction: column;
 
+				.img {
+
+				} 
 				.name {
 					font-size: 10px;
 					text-overflow: ellipsis;
@@ -241,7 +247,7 @@ $triangle-size: 100px;
   .left {
     // border: 3px solid black;
     border-color: #6666FF;
-		transform: translateX($triangle-size / 2);
+		transform: translateX(math.div($triangle-size, 2));
 	
 
 		.rect {
@@ -256,7 +262,7 @@ $triangle-size: 100px;
   .right {
     // border: 3px solid black;
     border-color: #FF6666;
-		transform: translateX(-$triangle-size / 2);
+		transform: translateX(math.div(-$triangle-size, 2));
 
 		.rect {
 			background-color: #FF6666;
@@ -266,4 +272,82 @@ $triangle-size: 100px;
 			border-right-color: #FF6666;
 		}
   }
+}
+
+#smash.smash {
+	.left {
+		animation: smash-left .4s ease-in forwards;
+		
+		@keyframes smash-left {
+			from {
+				transform: translateX(-75vw);
+			}
+
+			to {
+				transform: translateX(math.div($triangle-size, 2));
+			}
+		}
+	}
+
+	.right {
+		animation: smash-right .4s ease-in forwards;
+		
+		@keyframes smash-right {
+			from {
+				transform: translateX(75vw);
+			}
+
+			to {
+				transform: translateX(math.div(-$triangle-size, 2));
+			}
+		}
+	}
+}
+
+#smash.hide {
+	animation: hide .5s ease-in forwards;
+
+	@keyframes hide {
+		from {
+			opacity: 1;
+		}
+
+		to {
+			opacity: 0;
+		}
+
+		99.9% {
+			display: flex;
+		}
+
+		100% {
+			display: none;
+		}
+	}
+}
+
+#smash.show {
+	animation: show .5s ease-in forwards;
+
+	@keyframes show {
+		from {
+			opacity: 0;
+		}
+
+		to {
+			opacity: 1;
+		}
+
+		0% {
+			display: none;
+		}
+
+		.1% {
+			display: flex;
+		}
+	}
+}
+
+#smash.hidden {
+	display: none;
 }
