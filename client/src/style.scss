@@ -256,7 +256,7 @@ $triangle-size: 100px;
   .right {
     // border: 3px solid black;
     border-color: #FF6666;
-		transform: translate(-$triangle-size / 2);
+		transform: translateX(-$triangle-size / 2);
 
 		.rect {
 			background-color: #FF6666;
