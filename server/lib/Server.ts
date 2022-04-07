@@ -16,7 +16,7 @@ const server = app.listen(port, () =>
 
 const io = new Server(server, {
   cors: {
-    origin: process.argv.includes("-host") ? "http://localhost:8080" : ["https://sockey-game.herokuapp.com", "https://www.lexma.cf", "https://sockey.fezzle.dev"],
+    origin: !process.argv.includes("-host") ? "http://localhost:8080" : ["https://sockey-game.herokuapp.com", "https://www.lexma.cf", "https://sockey.fezzle.dev"],
     methods: ["GET", "POST"],
   },
 });
