@@ -7,7 +7,7 @@ function connect(): Promise<Socket> {
 	return new Promise((resolve, reject) => {
 		if (socket === null) {
 			// @ts-ignore
-			socket = io(import.meta.env.DEV ? 'http://localhost:8081' : location.href);
+			socket = io(import.meta.env.DEV ? 'http://localhost:8081' : 'https://sockey-game.herokuapp.com');
 			socket.on('connect', () => {
 				console.log('connected');
 				resolve(socket);
