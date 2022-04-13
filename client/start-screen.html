@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Start Screen</title>
+	<script src="fonts/fontawesome/js/all.js"></script>
+</head>
+<body>
+	<div class="outer">
+		<!-- red an blue thing at the top -->
+		<div class="sockey">
+			<div class="left">
+				<div class="triangle-tl"></div>
+				<div class="rect">soc</div>
+				<div class="triangle-br"></div>
+			</div>
+			<div class="right">
+				<div class="triangle-tl"></div>
+				<div class="rect">key</div>
+				<div class="triangle-br"></div>
+			</div>
+		</div>
+		<!-- name and start buttons -->
+		<form action="" onsubmit="event.preventDefault();" class="form">
+			<input type="text" class='name' placeholder="Enter your name"/>
+			<input class="start" type="submit" value="Start"/>
+		</form>
+		<!-- bottom buttons -->
+		<div class="btns">
+			<div class="btn">
+				<i class="fa fa-circle-question"></i>
+				How to play
+			</div>
+			<div class="spacer"></div>
+			<div class="btn">
+				<div class="icon"></div>
+				<i class="fa fa-circle-info icon-fa"></i>
+				About
+			</div>
+			<div class="spacer"></div>
+			<div class="btn">
+				<i class="fa-brands fa-github"></i>
+				Github
+			</div>
+		</div>
+	</div>
+	<div class="modal-outer">
+		<div class="modal">
+			<div class="top">
+				<div class="text">
+					How to Play
+				</div>
+
+				<div class="close">
+					<i class="fa-solid fa-x"></i>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="module" src="/start-screen.ts"></script>
+</body>
+</html>

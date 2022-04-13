@@ -56,10 +56,10 @@ class Game {
 
 		socket.on('start', this.onStart.bind(this));
 
-		this.addSmashImages(images);
+		this.addImages(images);
 	}
 
-	addSmashImages(images: { [key: string]: HTMLImageElement }) {
+	addImages(images: { [key: string]: HTMLImageElement }) {
 		const leftContainers = document.querySelectorAll('#smash .left .rect .player .img');
 		const rightContainers = document.querySelectorAll('#smash .right .rect .player .img');
 		console.log(leftContainers);
@@ -71,7 +71,10 @@ class Game {
 
 		rightContainers.forEach(container => {
 			container.appendChild(images.redPlayer.cloneNode(true));
-		})
+		});
+
+		document.querySelectorAll('.waiting .outer .inner .loading')[0].appendChild(images.bluePlayer.cloneNode(true));
+		document.querySelectorAll('.waiting .outer .inner .loading')[1].appendChild(images.redPlayer.cloneNode(true));
 	}
 
 	onPerson(people: number) {
