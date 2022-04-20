@@ -56,10 +56,33 @@ class Game {
 
 		socket.on('start', this.onStart.bind(this));
 
-		this.addSmashImages(images);
+		this.addImages(images);
+
+		// set up start screen
+		const form: HTMLFormElement = document.querySelector('.start-outer .outer .form');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const data = new FormData(form);
+
+			const name = data.get('name') as string;
+
+			socket.emit('init', name);
+
+			// hide start screen
+			// @ts-ignore
+			document.querySelector('.start-outer').style.display = 'none';
+		});
+
+		// @ts-ignore
+		if (localStorage.getItem('autostart') && localStorage.getItem('autostart') !== '' && import.meta.env.DEV) {
+			console.log('autostart');
+			(document.querySelector('.start-outer .outer .form .name') as HTMLInputElement).value = localStorage.getItem('autostart');
+			setTimeout(() => (document.querySelector('.start-outer .outer .form .start') as HTMLInputElement).click(), 1000);
+		}
 	}
 
-	addSmashImages(images: { [key: string]: HTMLImageElement }) {
+	addImages(images: { [key: string]: HTMLImageElement }) {
 		const leftContainers = document.querySelectorAll('#smash .left .rect .player .img');
 		const rightContainers = document.querySelectorAll('#smash .right .rect .player .img');
 		console.log(leftContainers);
@@ -71,7 +94,10 @@ class Game {
 
 		rightContainers.forEach(container => {
 			container.appendChild(images.redPlayer.cloneNode(true));
-		})
+		});
+
+		document.querySelectorAll('.waiting .outer .inner .loading')[0].appendChild(images.bluePlayer.cloneNode(true));
+		document.querySelectorAll('.waiting .outer .inner .loading')[1].appendChild(images.redPlayer.cloneNode(true));
 	}
 
 	onPerson(people: number) {

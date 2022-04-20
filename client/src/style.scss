@@ -42,6 +42,51 @@
       content: "...";
     }
   }
+
+	.outer {
+		$size: 400px;
+		width: $size;
+		height: $size;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+
+		.inner {
+			display: flex;
+			animation: rotate 6s linear infinite;
+			.loading {
+				height: 20px;
+				display: inline-block;
+			}
+
+			.spacer {
+				width: $size - 40px;
+				height: 30px;
+				animation: bounce 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+
+				@keyframes bounce {
+					0%, 100% {
+						width: $size - 40px;
+					}
+
+					50% {
+						width: 0;
+					}
+				}
+			}
+
+			@keyframes rotate {
+				0% {
+					transform: rotate(0deg);
+				}
+
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+		}
+	}
 }
 
 #game {
@@ -225,9 +270,9 @@ $triangle-size: 100px;
 				align-items: center;
 				flex-direction: column;
 
-				.img {
+				// .img {
 
-				} 
+				// }
 				.name {
 					font-size: 10px;
 					text-overflow: ellipsis;

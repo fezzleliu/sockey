@@ -1,4 +1,5 @@
 import './style.scss';
+import './start.scss';
 import Game from './Game';
 import connect from './lib/socketio';
 import loadImages from './lib/imageLoader';
@@ -6,7 +7,7 @@ import loadImages from './lib/imageLoader';
 import redPlayer from '../assets/player_red.png';
 // @ts-ignore
 import bluePlayer from '../assets/player_blue.png';
-
+import './start-screen';
 
 
 // load images
@@ -33,7 +34,6 @@ loadImages(
 			}
 		});
 	}
-
 	
 	const game = new Game(images);
 });
