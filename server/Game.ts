@@ -83,6 +83,10 @@ class Game {
 			}
 		});
 
+		socket.on('disconnect', () => {
+			this.removePlayer(player);
+		});
+
 		return player;
 	}
 

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script src="fonts/fontawesome/js/all.js"></script>
     <title>Sockey</title>
   </head>
   <body>
@@ -61,6 +62,49 @@
         </div>
       </div>
     </div>
+		<div class="start-outer">
+			<div class="outer">
+				<!-- red an blue thing at the top -->
+				<div class="sockey">
+					<div class="left">
+						<div class="triangle-tl"></div>
+						<div class="rect">soc</div>
+						<div class="triangle-br"></div>
+					</div>
+					<div class="right">
+						<div class="triangle-tl"></div>
+						<div class="rect">key</div>
+						<div class="triangle-br"></div>
+					</div>
+				</div>
+				<!-- guys in the middle -->
+				<div class="players">
+				</div>
+				<!-- name and start buttons -->
+				<form action="" onsubmit="event.preventDefault();" class="form">
+					<input type="text" class='name' name='name' placeholder="Enter your name"/>
+					<input class="start" type="submit" value="Start"/>
+				</form>
+				<!-- bottom buttons -->
+				<div class="btns">
+					<div class="btn how">
+						<i class="fa fa-circle-question"></i>
+						How to play
+					</div>
+					<div class="spacer"></div>
+					<div class="btn about">
+						<div class="icon"></div>
+						<i class="fa fa-circle-info icon-fa"></i>
+						About
+					</div>
+					<div class="spacer"></div>
+					<div class="btn" onclick="window.open('https://github.com/fezzleliu/sockey')">
+						<i class="fa-brands fa-github"></i>
+						Github
+					</div>
+				</div>
+			</div>
+		</div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

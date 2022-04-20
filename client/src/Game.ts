@@ -57,6 +57,29 @@ class Game {
 		socket.on('start', this.onStart.bind(this));
 
 		this.addImages(images);
+
+		// set up start screen
+		const form: HTMLFormElement = document.querySelector('.start-outer .outer .form');
+
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			const data = new FormData(form);
+
+			const name = data.get('name') as string;
+
+			socket.emit('init', name);
+
+			// hide start screen
+			// @ts-ignore
+			document.querySelector('.start-outer').style.display = 'none';
+		});
+
+		// @ts-ignore
+		if (localStorage.getItem('autostart') && localStorage.getItem('autostart') !== '' && import.meta.env.DEV) {
+			console.log('autostart');
+			(document.querySelector('.start-outer .outer .form .name') as HTMLInputElement).value = localStorage.getItem('autostart');
+			setTimeout(() => (document.querySelector('.start-outer .outer .form .start') as HTMLInputElement).click(), 1000);
+		}
 	}
 
 	addImages(images: { [key: string]: HTMLImageElement }) {
