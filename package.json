@@ -30,7 +30,7 @@
     "dev": "vite --port 8080 --host & nodemon ./server/index.ts",
     "client": "vite --port 8080 --host",
     "server": "nodemon ./server/index.ts",
-    "build": "vite build",
+    "build": "vite build && cp -r ./client/fonts ./client/dist",
     "preview": "vite preview --host",
     "start": "node --experimental-specifier-resolution=node --loader ts-node/esm ./server/index.ts -host"
   },
