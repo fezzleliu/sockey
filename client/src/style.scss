@@ -2,6 +2,10 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Space+Mono:wght@700&display=swap");
 
+.none {
+  display: none !important;
+}
+
 .waiting {
   position: fixed;
   top: 0;
@@ -43,50 +47,50 @@
     }
   }
 
-	.outer {
-		$size: 400px;
-		width: $size;
-		height: $size;
-		display: flex;
-		justify-content: center;
-		align-items: center;
+  .outer {
+    $size: 400px;
+    width: $size;
+    height: $size;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+    .inner {
+      display: flex;
+      animation: rotate 6s linear infinite;
+      .loading {
+        height: 20px;
+        display: inline-block;
+      }
 
-		.inner {
-			display: flex;
-			animation: rotate 6s linear infinite;
-			.loading {
-				height: 20px;
-				display: inline-block;
-			}
+      .spacer {
+        width: $size - 40px;
+        height: 30px;
+        animation: bounce 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 
-			.spacer {
-				width: $size - 40px;
-				height: 30px;
-				animation: bounce 1.5s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        @keyframes bounce {
+          0%,
+          100% {
+            width: $size - 40px;
+          }
 
-				@keyframes bounce {
-					0%, 100% {
-						width: $size - 40px;
-					}
+          50% {
+            width: 0;
+          }
+        }
+      }
 
-					50% {
-						width: 0;
-					}
-				}
-			}
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
 
-			@keyframes rotate {
-				0% {
-					transform: rotate(0deg);
-				}
-
-				100% {
-					transform: rotate(360deg);
-				}
-			}
-		}
-	}
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
+  }
 }
 
 #game {
@@ -235,9 +239,9 @@ $triangle-size: 100px;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba($color: #000000, $alpha: .5);
+  background-color: rgba($color: #000000, $alpha: 0.5);
   z-index: 100;
-	user-select: none;
+  user-select: none;
 
   display: flex;
   justify-content: center;
@@ -254,145 +258,152 @@ $triangle-size: 100px;
     .rect {
       height: inherit;
       flex-grow: 1;
-			display: flex;
-			justify-content: center;
-			align-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       // background-color: rgba($color: #000000, $alpha: 0.1);
 
-			.player {
-				height: inherit;
-				flex: 1;
-				// background-color: black;
-				color: white;
-				
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				flex-direction: column;
+      .player {
+        height: inherit;
+        flex: 1;
+        // background-color: black;
+        color: white;
 
-				// .img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
 
-				// }
-				.name {
-					font-size: 10px;
-					text-overflow: ellipsis;
-					width: inherit;
-				}
-			}
+        // .img {
+
+        // }
+        .name {
+          font-size: 10px;
+          text-overflow: ellipsis;
+          width: inherit;
+        }
+      }
     }
 
     .triangle {
       width: 0;
-      height: 0;
+
       border-bottom: $triangle-size solid rgba($color: #000000, $alpha: 0);
       border-right: $triangle-size solid rgba($color: #000000, $alpha: 0);
+      height: 0;
     }
   }
 
   .left {
     // border: 3px solid black;
-    border-color: #6666FF;
-		transform: translateX(math.div($triangle-size, 2));
-	
+    border-color: #6666ff;
+    transform: translateX(math.div($triangle-size, 2));
 
-		.rect {
-			background-color: #6666FF;
-		}
+    .rect {
+      background-color: #6666ff;
+    }
 
-		.triangle {
-			border-bottom-color: #6666FF;
-		}
-		
-	}
+    .triangle {
+      border-bottom-color: #6666ff;
+    }
+  }
   .right {
     // border: 3px solid black;
-    border-color: #FF6666;
-		transform: translateX(math.div(-$triangle-size, 2));
+    border-color: #ff6666;
+    transform: translateX(math.div(-$triangle-size, 2));
 
-		.rect {
-			background-color: #FF6666;
-		}
+    .rect {
+      background-color: #ff6666;
+    }
 
-		.triangle {
-			border-right-color: #FF6666;
-		}
+    .triangle {
+      border-right-color: #ff6666;
+    }
   }
 }
 
 #smash.smash {
-	.left {
-		animation: smash-left .4s ease-in forwards;
-		
-		@keyframes smash-left {
-			from {
-				transform: translateX(-75vw);
-			}
+  .left {
+    animation: smash-left 0.4s ease-in forwards;
 
-			to {
-				transform: translateX(math.div($triangle-size, 2));
-			}
-		}
-	}
+    @keyframes smash-left {
+      from {
+        transform: translateX(-75vw);
+      }
 
-	.right {
-		animation: smash-right .4s ease-in forwards;
-		
-		@keyframes smash-right {
-			from {
-				transform: translateX(75vw);
-			}
+      to {
+        transform: translateX(math.div($triangle-size, 2));
+      }
+    }
+  }
 
-			to {
-				transform: translateX(math.div(-$triangle-size, 2));
-			}
-		}
-	}
+  .right {
+    animation: smash-right 0.4s ease-in forwards;
+
+    @keyframes smash-right {
+      from {
+        transform: translateX(75vw);
+      }
+
+      to {
+        transform: translateX(math.div(-$triangle-size, 2));
+      }
+    }
+  }
 }
 
 #smash.hide {
-	animation: hide .5s ease-in forwards;
+  animation: hide-smash 0.5s ease-in forwards;
 
-	@keyframes hide {
-		from {
-			opacity: 1;
-		}
+  @keyframes hide-smash {
+    0% {
+      opacity: 1;
+    }
 
-		to {
-			opacity: 0;
-		}
+    99.9% {
+      opacity: 0.001;
+      display: flex;
+    }
 
-		99.9% {
-			display: flex;
-		}
-
-		100% {
-			display: none;
-		}
-	}
+    100% {
+      display: none;
+      opacity: 0;
+    }
+  }
 }
 
 #smash.show {
-	animation: show .5s ease-in forwards;
+  animation: show-smash 0.5s ease-in forwards;
 
-	@keyframes show {
-		from {
-			opacity: 0;
-		}
+  @keyframes show-smash {
+    from {
+      opacity: 0;
+    }
 
-		to {
-			opacity: 1;
-		}
+    to {
+      opacity: 1;
+    }
 
-		0% {
-			display: none;
-		}
+    0% {
+      display: none;
+    }
 
-		.1% {
-			display: flex;
-		}
-	}
+    .1% {
+      display: flex;
+    }
+  }
 }
 
 #smash.hidden {
-	display: none;
+  display: none;
+}
+
+.shoot {
+  position: absolute;
+	width: 100px;
+	height: 112px;
+  bottom: 30px;
+  right: 30px;
+
+  z-index: 10;
 }

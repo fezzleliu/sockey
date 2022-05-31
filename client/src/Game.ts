@@ -1,358 +1,464 @@
-import { socket } from './lib/socketio';
-import { InitData, InitPlayer } from './lib/types';
-import Player from './Player';
-import Constants from '../../server/lib/Constants';
-import { RGB } from './lib/utils';
+import { socket } from "./lib/socketio";
+import { InitData, InitPlayer } from "./lib/types";
+import Player from "./Player";
+import Constants from "../../server/lib/Constants";
+import { RGB } from "./lib/utils";
+import { Joystick } from "@fezzle/joystick";
 
 class Game {
-	
-	data: InitData
-	players: Player[]
-	me: Player
-	canvas: HTMLCanvasElement;
-	ctx: CanvasRenderingContext2D;
-	scale: number;
-	mousePos: { x: number; y: number; };
-	movement: { key: boolean; mouse: boolean; left: boolean; right: boolean; };
-	ball: { x: number; y: number; charge: number, color: RGB; charged: string; };
-	points: [number, number];
-	startTime: number;
+  data: InitData;
+  players: Player[];
+  me: Player;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  scale: number;
+  mousePos: { x: number; y: number };
+  movement: { key: boolean; mouse: boolean; left: boolean; right: boolean };
+  ball: { x: number; y: number; charge: number; color: RGB; charged: string };
+  points: [number, number];
+  startTime: number;
+  joystick: Joystick;
+  useMobile: boolean;
+  charging: boolean;
+  charger: SVGAElement;
+  chargeStart: number;
 
+  constructor(images: { [key: string]: HTMLImageElement }) {
+    console.log("game initalizing");
 
-	constructor(images: { [key: string]: HTMLImageElement }) {
-		console.log('game initalizing');
+    this.useMobile = true;
 
-		this.data = {
-			board: {
-				width: 1500,
-				height: 600,
-				goalHeight: 0,
-			},
-			players: 6,
-			id: '',
+    this.data = {
+      board: {
+        width: 1500,
+        height: 600,
+        goalHeight: 0,
+      },
+      players: 6,
+      id: "",
+    };
+
+    this.players = [];
+
+    this.ball = {
+      x: 0,
+      y: 0,
+      charge: 0,
+      color: new RGB("#808080"),
+      charged: "#FFFF00",
+    };
+
+    this.startTime = 0;
+
+    socket.on("people", this.onPerson.bind(this));
+
+    socket.on("id", (id: string) => {
+      this.data.id = id;
+      console.log("id:", this.data.id);
+      console.log("connected to server");
+
+      socket.emit("ready");
+    });
+
+    socket.on("start", this.onStart.bind(this));
+
+    this.addImages(images);
+
+    // set up start screen
+    const form: HTMLFormElement = document.querySelector(".start-outer .outer .form");
+
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const data = new FormData(form);
+
+      const name = data.get("name") as string;
+
+      socket.emit("init", name);
+
+      // hide start screen
+      // @ts-ignore
+      document.querySelector(".start-outer").style.display = "none";
+    });
+
+    if (
+      localStorage.getItem("autostart") &&
+      localStorage.getItem("autostart") !== "" &&
+      // @ts-ignore
+      import.meta.env.DEV
+    ) {
+      console.log("autostart");
+      (document.querySelector(".start-outer .outer .form .name") as HTMLInputElement).value =
+        localStorage.getItem("autostart");
+      setTimeout(
+        () => (document.querySelector(".start-outer .outer .form .start") as HTMLInputElement).click(),
+        1000
+      );
+    }
+  }
+
+  addImages(images: { [key: string]: HTMLImageElement }) {
+    const leftContainers = document.querySelectorAll("#smash .left .rect .player .img");
+    const rightContainers = document.querySelectorAll("#smash .right .rect .player .img");
+    console.log(leftContainers);
+    console.log(rightContainers);
+
+    leftContainers.forEach(container => {
+      container.appendChild(images.bluePlayer.cloneNode(true));
+    });
+
+    rightContainers.forEach(container => {
+      container.appendChild(images.redPlayer.cloneNode(true));
+    });
+
+    document
+      .querySelectorAll(".waiting .outer .inner .loading")[0]
+      .appendChild(images.bluePlayer.cloneNode(true));
+    document
+      .querySelectorAll(".waiting .outer .inner .loading")[1]
+      .appendChild(images.redPlayer.cloneNode(true));
+  }
+
+  onPerson(people: number) {
+    document.getElementById("waiting").innerHTML = `${people}/${this.data.players} joined`;
+  }
+
+  onStart(players: InitPlayer[]) {
+    console.log("start");
+
+    // create plaeyrs
+    players.forEach(playerData => {
+      const player = new Player(playerData);
+      this.players.push(player);
+
+      // save the you player into the Game.me
+      if (playerData.id === this.data.id) {
+        console.log("its me!");
+        this.me = player;
+      }
+    });
+
+    // hide waiting for players to join
+    //@ts-ignore
+    document.getElementsByClassName("waiting")[0].style.display = "none";
+
+    // run other start stuff
+    this.start();
+  }
+
+  start() {
+    console.log(this.data.id);
+    // clear game div
+    document.getElementById("game").innerHTML = "";
+
+    const canvas = document.getElementById("game").appendChild(document.createElement("canvas"));
+
+    const ctx = canvas.getContext("2d");
+
+    this.canvas = canvas;
+    this.ctx = ctx;
+
+    // resizing
+    const resizeCanvas = () => {
+      const { width, height } = this.maintainAspectMax(this.data.board.width / this.data.board.height, {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+
+      canvas.width = width;
+      canvas.height = height;
+
+      this.scale = canvas.width / this.data.board.width;
+    };
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // bring game element to top
+    document.getElementById("game").classList.add("active");
+
+    // listen for updates server side
+    socket.on("update", this.onServerUpdate.bind(this));
+
+    // start main game loop
+    this.startGameLoop();
+
+    setTimeout(this.createEventBindings.bind(this), Constants.GAME.BEGIN_WAIT * 1000);
+
+    this.mousePos = {
+      x: 0,
+      y: 0,
+    };
+
+    this.movement = {
+      key: false,
+      mouse: false,
+      left: false,
+      right: false,
+    };
+
+    this.points = [0, 0];
+
+    this.startTime = performance ? performance.now() : Date.now();
+
+    // starting animationa
+    document.querySelector("#smash").classList.remove("hidden");
+    document.querySelector("#smash").classList.add("show");
+    setTimeout(() => {
+      document.querySelector("#smash").classList.add("smash");
+    }, 50);
+    setTimeout(() => {
+      document.querySelector("#smash").classList.remove("show");
+      document.querySelector("#smash").classList.remove("smash");
+      document.querySelector("#smash").classList.add("hide");
+      setTimeout(() => {
+        document.querySelector("#smash").classList.add("none");
+      });
+
+      document.querySelector("#countdown").classList.add("countdown");
+    }, 2000);
+
+    this.mobileMode();
+  }
+
+  mobileMode() {
+    this.joystick = new Joystick({ innerRadius: 25, outerRadius: 60 });
+
+    document.body.appendChild(this.joystick.dom);
+
+    this.joystick.dom.classList.add("joy");
+
+    this.joystick.dom.style.cssText =
+      "position: fixed; bottom: 10px; left:10px; /* backdrop-filter: blur(2px); */";
+
+    this.charging = false;
+    this.chargeStart = performance.now();
+
+    this.charger = document.querySelector(".shoot");
+  }
+
+  createEventBindings() {
+    if (!this.useMobile) {
+      // mouse movement for angle changes and stuff
+      window.addEventListener("mousemove", ({ clientX, clientY }): void => {
+        const { x: canvasX, y: canvasY } = this.canvas.getBoundingClientRect();
+        const mouseX = clientX - canvasX,
+          mouseY = clientY - canvasY;
+        const realX = mouseX / this.scale,
+          realY = mouseY / this.scale;
+
+        const angle = Math.atan2(this.me.y - realY, this.me.x - realX);
+
+        socket.emit("angle", angle);
+      });
+
+      window.addEventListener("keydown", ({ key, repeat }): void => {
+        if (!repeat && ["w", "Up", "ArrowUp"].includes(key)) {
+          this.movement.key = true;
+          this.updateMovement();
+        } else if (!repeat && ["a", "Left", "ArrowLeft"].includes(key)) {
+          this.movement.left = true;
+        } else if (!repeat && ["d", "Right", "ArrowRight"].includes(key)) {
+          this.movement.right = true;
+        } else if (!repeat && [" "].includes(key)) {
+          socket.emit("charge");
+        }
+      });
+
+      window.addEventListener("keyup", ({ key }): void => {
+        if (["w", "Up", "ArrowUp"].includes(key)) {
+          this.movement.key = false;
+          this.updateMovement();
+        } else if (["a", "Left", "ArrowLeft"].includes(key)) {
+          this.movement.left = false;
+        } else if (["d", "Right", "ArrowRight"].includes(key)) {
+          this.movement.right = false;
+        } else if ([" "].includes(key)) {
+          socket.emit("shoot");
+        }
+      });
+
+      window.addEventListener("mousedown", () => {
+        this.movement.mouse = true;
+        this.updateMovement();
+      });
+
+      window.addEventListener("mouseup", () => {
+        this.movement.mouse = false;
+        this.updateMovement();
+      });
+    } else {
+      this.joystick.on("start", () => {
+        this.movement.mouse = true;
+        this.updateMovement();
+      });
+
+      this.joystick.on("end", () => {
+        this.movement.mouse = false;
+        this.updateMovement();
+      });
+
+      this.joystick.on("move", angle => {
+        socket.emit("angle", angle + Math.PI / 2);
+      });
+
+      this.charger.addEventListener("touchstart", () => {
+        this.charging = true;
+        socket.emit("charge");
+      });
+
+      this.charger.addEventListener("touchend", () => {
+        this.charging = false;
+        socket.emit("shoot");
+      });
+
+      this.charger.addEventListener("touchcancel", () => {
+        this.charging = false;
+        socket.emit("shoot");
+      });
+    }
+  }
+
+  maintainAspectMax(aspect: number, { width, height }: { width: number; height: number }) {
+    const containerAspect = width / height;
+    let newWidth: number, newHeight: number;
+    if (aspect > containerAspect) {
+      // Relativly wider compared to container
+      newWidth = width;
+      newHeight = width / aspect;
+    } else {
+      // Relativly taller compared to container
+      newWidth / height;
+      newWidth = height * aspect;
+    }
+    return {
+      width: newWidth,
+      height: newHeight,
+    };
+  }
+
+  updateMovement() {
+    socket.emit("movement", this.movement.key || this.movement.mouse);
+  }
+
+  onServerUpdate(
+    players: InitPlayer[],
+    ball: { x: number; y: number; charge: number },
+    points: [number, number]
+  ) {
+    players.forEach(playerData => {
+      const player = this.players.find(({ id }) => id === playerData.id);
+      if (typeof player !== "undefined") {
+        player.update(playerData);
+      }
+    });
+
+    this.ball.x = ball.x;
+    this.ball.y = ball.y;
+    this.ball.charge = ball.charge;
+
+    if (this.points[0] !== points[0] || this.points[1] !== points[1]) {
+      this.points = points;
+      console.log(points);
+      document.querySelector(".points .left").innerHTML = points[0].toString();
+      document.querySelector(".points .right").innerHTML = points[1].toString();
+    }
+  }
+
+  startGameLoop() {
+    requestAnimationFrame(this.gameLoop.bind(this));
+  }
+
+  gameLoop() {
+    requestAnimationFrame(this.gameLoop.bind(this));
+
+    // reset for redrawing
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    // draw goals
+    const leftGoalColor = this.me.team === 0 ? "blue" : "red",
+      rightGoalColor = this.me.team === 0 ? "red" : "blue",
+      goalTop = ((1 - Constants.GAME.GOAL.HEIGHT) / 2) * this.canvas.height;
+
+    // left goal
+    this.ctx.fillStyle = leftGoalColor;
+    this.ctx.fillRect(
+      0,
+      goalTop,
+      Constants.GAME.GOAL.WIDTH * this.scale,
+      Constants.GAME.GOAL.HEIGHT * this.canvas.height
+    );
+
+    // right goal
+    this.ctx.fillStyle = rightGoalColor;
+    this.ctx.fillRect(
+      (Constants.GAME.WIDTH - Constants.GAME.GOAL.WIDTH) * this.scale,
+      goalTop,
+      Constants.GAME.GOAL.WIDTH * this.scale,
+      Constants.GAME.GOAL.HEIGHT * this.canvas.height
+    );
+
+    this.players.forEach(player => {
+      if (player === this.me) return;
+      player.draw(this.ctx, this.scale, this.me);
+    });
+
+    // draw player on top
+    this.me.draw(this.ctx, this.scale, this.me);
+
+    // then ball
+    this.ctx.fillStyle = this.ball.color.fade(
+      this.ball.charged,
+      this.ball.charge / Constants.BALL.MAX_CHARGE
+    );
+    this.ctx.strokeStyle = "black";
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.translate(this.ball.x * this.scale, this.ball.y * this.scale);
+    this.ctx.arc(0, 0, Constants.BALL.RADIUS * this.scale, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.stroke();
+    this.ctx.restore();
+
+    // if using arrow keys rotate player
+    if ((this.movement.left || this.movement.right) && !(this.movement.left && this.movement.right)) {
+      const newAngle = this.me.angle + (this.movement.left ? -1 : 1) * Constants.PLAYER.TURN_SPEED;
+      socket.emit("angle", newAngle);
+    }
+
+    // update timer on the top
+    const currentTime = performance ? performance.now() : Date.now();
+    const elapsedTime = Math.min(
+      Math.max((currentTime - this.startTime) / 1000, Constants.GAME.BEGIN_WAIT),
+      Constants.GAME.TIME_LENGTH
+    );
+
+    const minutesElapsed = Math.floor(elapsedTime / 60);
+    const minutesLeft = Math.floor(Constants.GAME.TIME_LENGTH / 60) - minutesElapsed - 1;
+
+    const secondsElapsed = elapsedTime - minutesElapsed / 60;
+    const secondsLeft = Constants.GAME.TIME_LENGTH - minutesLeft * 60 - secondsElapsed;
+
+    const timeLeft = minutesLeft.toString() + ":" + secondsLeft.toFixed(1).padStart(4, "0");
+
+    document.querySelector(".points .timer").innerHTML = timeLeft;
+
+    // update the mobile charger thingy
+    if (this.charger && this.charging) {
+			const charge = this.ball.charge / Constants.BALL.MAX_CHARGE * 100;
+			
+      document.getElementById("charge-stop-first").setAttribute("offset", `${charge}%`);
+      document
+        .getElementById("charge-stop-second")
+        .setAttribute("offset", `${Math.min(charge + 0.01, 100)}%`);
+    } else {
+			const charge = 0;
+			
+      document.getElementById("charge-stop-first").setAttribute("offset", `${charge}%`);
+      document
+        .getElementById("charge-stop-second")
+        .setAttribute("offset", `${Math.min(charge + 0.01, 100)}%`);
 		}
-
-		this.players = [];
-
-		this.ball = {
-			x: 0,
-			y: 0,
-			charge: 0,
-			color: new RGB('#808080'),
-			charged: '#FFFF00',
-		}
-
-		this.startTime = 0;
-		
-		socket.on('people', this.onPerson.bind(this));
-
-		socket.on('id', (id: string) => {
-			this.data.id = id;
-			console.log('id:', this.data.id);
-			console.log('connected to server');
-
-			socket.emit('ready');
-		});
-
-		socket.on('start', this.onStart.bind(this));
-
-		this.addImages(images);
-
-		// set up start screen
-		const form: HTMLFormElement = document.querySelector('.start-outer .outer .form');
-
-		form.addEventListener('submit', (e) => {
-			e.preventDefault();
-			const data = new FormData(form);
-
-			const name = data.get('name') as string;
-
-			socket.emit('init', name);
-
-			// hide start screen
-			// @ts-ignore
-			document.querySelector('.start-outer').style.display = 'none';
-		});
-
-		// @ts-ignore
-		if (localStorage.getItem('autostart') && localStorage.getItem('autostart') !== '' && import.meta.env.DEV) {
-			console.log('autostart');
-			(document.querySelector('.start-outer .outer .form .name') as HTMLInputElement).value = localStorage.getItem('autostart');
-			setTimeout(() => (document.querySelector('.start-outer .outer .form .start') as HTMLInputElement).click(), 1000);
-		}
-	}
-
-	addImages(images: { [key: string]: HTMLImageElement }) {
-		const leftContainers = document.querySelectorAll('#smash .left .rect .player .img');
-		const rightContainers = document.querySelectorAll('#smash .right .rect .player .img');
-		console.log(leftContainers);
-		console.log(rightContainers);
-
-		leftContainers.forEach(container => {
-			container.appendChild(images.bluePlayer.cloneNode(true));
-		});
-
-		rightContainers.forEach(container => {
-			container.appendChild(images.redPlayer.cloneNode(true));
-		});
-
-		document.querySelectorAll('.waiting .outer .inner .loading')[0].appendChild(images.bluePlayer.cloneNode(true));
-		document.querySelectorAll('.waiting .outer .inner .loading')[1].appendChild(images.redPlayer.cloneNode(true));
-	}
-
-	onPerson(people: number) {
-		document.getElementById('waiting').innerHTML = `${people}/${this.data.players} joined`;
-	}
-
-	onStart(players: InitPlayer[]) {
-		console.log('start');
-
-		// create plaeyrs
-		players.forEach(playerData => {
-			const player = new Player(playerData);
-			this.players.push(player);
-
-			// save the you player into the Game.me
-			if (playerData.id === this.data.id) {
-				console.log('its me!')
-				this.me = player;
-			}
-		});
-
-		// hide waiting for players to join
-		//@ts-ignore
-		document.getElementsByClassName('waiting')[0].style.display = 'none';
-
-		// run other start stuff
-		this.start();
-	}
-
-	start() {
-		console.log(this.data.id);
-		// clear game div
-		document.getElementById('game').innerHTML = '';
-
-		const canvas = document.getElementById('game').appendChild(document.createElement('canvas'));
-
-		const ctx = canvas.getContext('2d');
-
-		this.canvas = canvas;
-		this.ctx = ctx;
-
-		// resizing
-		const resizeCanvas = () => {
-			const { width, height } = this.maintainAspectMax(
-				this.data.board.width / this.data.board.height,
-				{
-					width: window.innerWidth,
-					height: window.innerHeight
-				},
-			);
-	
-			canvas.width = width;
-			canvas.height = height;
-
-			this.scale = canvas.width / this.data.board.width;
-		};
-
-		window.addEventListener('resize', resizeCanvas);
-		resizeCanvas();
-
-		// bring game element to top
-		document.getElementById('game').classList.add('active');
-
-		// listen for updates server side
-		socket.on('update', this.onServerUpdate.bind(this));
-
-		// start main game loop
-		this.startGameLoop();
-
-		setTimeout(this.createEventBindings.bind(this), Constants.GAME.BEGIN_WAIT * 1000);
-
-		this.mousePos = {
-			x: 0,
-			y: 0,
-		};
-
-		this.movement = {
-			key: false,
-			mouse: false,
-			left: false,
-			right: false,
-		};
-
-		this.points = [0, 0];
-
-		this.startTime = performance ? performance.now() : Date.now();
-
-		// starting animationa
-		document.querySelector('#smash').classList.remove('hidden');
-		document.querySelector('#smash').classList.add('show');
-		setTimeout(() => {
-			document.querySelector('#smash').classList.add('smash');
-		}, 50);
-		setTimeout(() => {
-			document.querySelector('#smash').classList.remove('show');
-			document.querySelector('#smash').classList.remove('smash');
-			document.querySelector('#smash').classList.add('hide');
-
-			document.querySelector('#countdown').classList.add('countdown');
-		}, 2000);
-	}
-
-	createEventBindings() {
-		// mouse movement for angle changes and stuff
-		window.addEventListener('mousemove', ({ clientX, clientY }): void => {
-			const { x: canvasX, y: canvasY } = this.canvas.getBoundingClientRect();
-			const mouseX = clientX - canvasX, mouseY = clientY - canvasY;
-			const realX = mouseX / this.scale, realY = mouseY / this.scale;
-
-			const angle = Math.atan2(this.me.y - realY, this.me.x - realX);
-
-			socket.emit('angle', angle);
-		});
-
-		window.addEventListener('keydown', ({ key, repeat }): void => {
-			if (!repeat && ['w', 'Up', 'ArrowUp'].includes(key)) {
-				this.movement.key = true;
-				this.updateMovement();
-			} else if (!repeat && ['a', 'Left', 'ArrowLeft'].includes(key)) {
-				this.movement.left = true;
-			} else if (!repeat && ['d', 'Right', 'ArrowRight'].includes(key)) {
-				this.movement.right = true;
-			} else if (!repeat && [' '].includes(key)) {
-				socket.emit('charge');
-			}
-		});
-
-		window.addEventListener('keyup', ({ key }): void => {
-			if (['w', 'Up', 'ArrowUp'].includes(key)) {
-				this.movement.key = false;
-				this.updateMovement();
-			} else if (['a', 'Left', 'ArrowLeft'].includes(key)) {
-				this.movement.left = false;
-			} else if (['d', 'Right', 'ArrowRight'].includes(key)) {
-				this.movement.right = false;
-			} else if ([' '].includes(key)) {
-				socket.emit('shoot');
-			}
-		});
-
-		window.addEventListener('mousedown', () => {
-			this.movement.mouse = true;
-			this.updateMovement();
-		});
-
-		window.addEventListener('mouseup', () => {
-			this.movement.mouse = false;
-			this.updateMovement();
-		});
-	}
-
-	maintainAspectMax(aspect: number, { width, height }: { width: number; height: number }) {
-		const containerAspect = width / height;
-		let newWidth: number, newHeight: number;
-		if (aspect > containerAspect) {
-			// Relativly wider compared to container
-			newWidth = width;
-			newHeight = width / aspect;
-		} else {
-			// Relativly taller compared to container
-			newWidth / height;
-			newWidth = height * aspect;
-		}
-		return {
-			width: newWidth,
-			height: newHeight,
-		}
-	}
-
-	updateMovement() {
-		socket.emit('movement', this.movement.key || this.movement.mouse);
-	}
-
-	onServerUpdate(players: InitPlayer[], ball: {x: number, y: number, charge: number }, points: [number, number]) {
-		players.forEach(playerData => {
-			const player = this.players.find(({ id }) => id === playerData.id);
-			if (typeof player !== 'undefined') {
-				player.update(playerData);
-			}
-		});
-
-		this.ball.x = ball.x;
-		this.ball.y = ball.y;
-		this.ball.charge = ball.charge;
-
-		if (this.points[0] !== points[0] || this.points[1] !== points[1]) {
-			this.points = points;
-			console.log(points)
-			document.querySelector('.points .left').innerHTML = points[0].toString();
-			document.querySelector('.points .right').innerHTML = points[1].toString();
-		}
-	}
-
-	startGameLoop() {
-		requestAnimationFrame(this.gameLoop.bind(this));
-	}
-
-	gameLoop() {
-		requestAnimationFrame(this.gameLoop.bind(this));
-
-		// reset for redrawing
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-		
-		// draw goals
-		const leftGoalColor = this.me.team === 0 ? 'blue' : 'red',
-			rightGoalColor = this.me.team === 0 ? 'red' : 'blue',
-			goalTop = (1 - Constants.GAME.GOAL.HEIGHT) / 2 * this.canvas.height;
-
-		// left goal
-		this.ctx.fillStyle = leftGoalColor;
-		this.ctx.fillRect(0, goalTop, Constants.GAME.GOAL.WIDTH * this.scale, Constants.GAME.GOAL.HEIGHT * this.canvas.height);
-
-		// right goal
-		this.ctx.fillStyle = rightGoalColor;
-		this.ctx.fillRect((Constants.GAME.WIDTH - Constants.GAME.GOAL.WIDTH) * this.scale, goalTop, Constants.GAME.GOAL.WIDTH * this.scale, Constants.GAME.GOAL.HEIGHT * this.canvas.height);
-
-		this.players.forEach(player => {
-			if (player === this.me) return;
-			player.draw(this.ctx, this.scale, this.me);
-		});
-
-		// draw player on top
-		this.me.draw(this.ctx, this.scale, this.me);
-
-		// then ball
-		this.ctx.fillStyle = this.ball.color.fade(this.ball.charged, this.ball.charge / Constants.BALL.MAX_CHARGE);
-		this.ctx.strokeStyle = 'black';
-		this.ctx.save();
-		this.ctx.beginPath();
-		this.ctx.translate(this.ball.x * this.scale, this.ball.y * this.scale);
-		this.ctx.arc(0, 0, Constants.BALL.RADIUS * this.scale, 0, Math.PI * 2);
-		this.ctx.fill();
-		this.ctx.stroke();
-		this.ctx.restore();
-
-		// if using arrow keys rotate player
-		if ((this.movement.left || this.movement.right) && !(this.movement.left && this.movement.right)) {
-			const newAngle = this.me.angle + (this.movement.left ? -1 : 1) * Constants.PLAYER.TURN_SPEED;
-			socket.emit('angle', newAngle);
-		}
-
-		// update timer on the top
-		const currentTime = performance ? performance.now() : Date.now();
-		const elapsedTime = Math.min(Math.max((currentTime - this.startTime) / 1000, Constants.GAME.BEGIN_WAIT), Constants.GAME.TIME_LENGTH);
-
-		const minutesElapsed = Math.floor(elapsedTime / 60);
-		const minutesLeft = Math.floor(Constants.GAME.TIME_LENGTH / 60) - minutesElapsed - 1;
-
-		const secondsElapsed = elapsedTime - minutesElapsed / 60;
-		const secondsLeft = Constants.GAME.TIME_LENGTH - minutesLeft * 60 - secondsElapsed;
-
-		const timeLeft = minutesLeft.toString() + ':' + secondsLeft.toFixed(1).padStart(4, '0')
-
-		document.querySelector('.points .timer').innerHTML = timeLeft;
-	}
+  }
 }
 
 export default Game;
