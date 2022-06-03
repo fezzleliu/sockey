@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<script src="fonts/fontawesome/js/all.js"></script>
+    <script src="fonts/fontawesome/js/all.js"></script>
     <title>Sockey</title>
   </head>
   <body>
@@ -12,14 +12,31 @@
       <div class="dots">Waiting for players to join</div>
       <div id="waiting"></div>
       <div class="outer">
-				<div class="inner">
-					<div class="loading"></div>
-					<div class="spacer"></div>
-					<div class="loading"></div>
-				</div>
-			</div>
+        <div class="inner">
+          <div class="loading"></div>
+          <div class="spacer"></div>
+          <div class="loading"></div>
+        </div>
+      </div>
     </div>
     <div id="game"></div>
+		<svg class="shoot">
+      <defs>
+        <linearGradient id="fill" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ffff00" />
+          <stop offset="0%" stop-color="#ffff00" id="charge-stop-first" />
+          <stop offset=".01%" stop-color="#ffffff" id="charge-stop-second" />
+          <stop offset="100%" stop-color="#ffffff" />
+        </linearGradient>
+      </defs>
+      <!-- up arrow polygon -->
+      <polygon
+        points="50,0 100,50 73,50 73,110 27,110 27,50 0,50"
+        fill="url(#fill)"
+        stroke-width="3"
+        stroke="black"
+      />
+    </svg>
     <div class="points">
       <div class="point left">0</div>
       <div class="timer">00:0.0</div>
@@ -62,49 +79,48 @@
         </div>
       </div>
     </div>
-		<div class="start-outer">
-			<div class="outer">
-				<!-- red an blue thing at the top -->
-				<div class="sockey">
-					<div class="left">
-						<div class="triangle-tl"></div>
-						<div class="rect">soc</div>
-						<div class="triangle-br"></div>
-					</div>
-					<div class="right">
-						<div class="triangle-tl"></div>
-						<div class="rect">key</div>
-						<div class="triangle-br"></div>
-					</div>
-				</div>
-				<!-- guys in the middle -->
-				<div class="players">
-				</div>
-				<!-- name and start buttons -->
-				<form action="" onsubmit="event.preventDefault();" class="form">
-					<input type="text" class='name' name='name' placeholder="Enter your name"/>
-					<input class="start" type="submit" value="Start"/>
-				</form>
-				<!-- bottom buttons -->
-				<div class="btns">
-					<div class="btn how">
-						<i class="fa fa-circle-question"></i>
-						How to play
-					</div>
-					<div class="spacer"></div>
-					<div class="btn about">
-						<div class="icon"></div>
-						<i class="fa fa-circle-info icon-fa"></i>
-						About
-					</div>
-					<div class="spacer"></div>
-					<div class="btn" onclick="window.open('https://github.com/fezzleliu/sockey')">
-						<i class="fa-brands fa-github"></i>
-						Github
-					</div>
-				</div>
-			</div>
-		</div>
+    <div class="start-outer">
+      <div class="outer">
+        <!-- red an blue thing at the top -->
+        <div class="sockey">
+          <div class="left">
+            <div class="triangle-tl"></div>
+            <div class="rect">soc</div>
+            <div class="triangle-br"></div>
+          </div>
+          <div class="right">
+            <div class="triangle-tl"></div>
+            <div class="rect">key</div>
+            <div class="triangle-br"></div>
+          </div>
+        </div>
+        <!-- guys in the middle -->
+        <div class="players"></div>
+        <!-- name and start buttons -->
+        <form action="" onsubmit="event.preventDefault();" class="form">
+          <input type="text" class="name" name="name" placeholder="Enter your name" />
+          <input class="start" type="submit" value="Start" />
+        </form>
+        <!-- bottom buttons -->
+        <div class="btns">
+          <div class="btn how">
+            <i class="fa fa-circle-question"></i>
+            How to play
+          </div>
+          <div class="spacer"></div>
+          <div class="btn about">
+            <div class="icon"></div>
+            <i class="fa fa-circle-info icon-fa"></i>
+            About
+          </div>
+          <div class="spacer"></div>
+          <div class="btn" onclick="window.open('https://github.com/fezzleliu/sockey')">
+            <i class="fa-brands fa-github"></i>
+            Github
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
