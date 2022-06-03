@@ -32,4 +32,9 @@ io.on('connection', (socket) => {
 	socket.on('init', (name: string) => {
 		emptyGame.addPlayer(socket, name);
 	});
+
+	socket.on('reload', () => {
+		if (process.argv.includes('--host')) return;
+		io.emit('reload');
+	});
 });

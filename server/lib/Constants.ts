@@ -9,11 +9,12 @@ const Constants = {
 		ID_LENGTH: 15,
 		FPS: 60,
 		GOAL: {
-			HEIGHT: 1 / 4,
+			HEIGHT: 1 / 2.5,
 			WIDTH: 10,
 		},
 		TIME_LENGTH: 3 * 60 + 5, // in seconds (3 minutes + 5 seconds)
 		BEGIN_WAIT: 5, // in seconds (5 seconds)
+		BOUNDARY_RADIUS: 350, // radius of the boundary that players cannot enter
 	},
 	PLAYER: {
 		RADIUS: 15, // radius of player

@@ -59,6 +59,22 @@ class Player extends Point {
 		else if (this.x + radius > width) this.x = width - radius;
 		if (this.y - radius < 0) this.y = radius;
 		else if (this.y + radius > height) this.y = height - radius;
+
+		// right boundary
+		if (this.team === 0 && this.distanceTo(new Point(Constants.GAME.WIDTH, Constants.GAME.HEIGHT / 2)) < Constants.GAME.BOUNDARY_RADIUS) {
+			// keep player out of circle
+			const angle = Math.atan2(this.y - Constants.GAME.HEIGHT / 2, this.x - Constants.GAME.WIDTH);
+			this.x = Constants.GAME.WIDTH + Constants.GAME.BOUNDARY_RADIUS * Math.cos(angle);
+			this.y = Constants.GAME.HEIGHT / 2 + Constants.GAME.BOUNDARY_RADIUS * Math.sin(angle);
+		}
+
+		// left boundary
+		if (this.team === 1 && this.distanceTo(new Point(0, Constants.GAME.HEIGHT / 2)) < Constants.GAME.BOUNDARY_RADIUS) {
+			// keep player out of circle
+			const angle = Math.atan2(this.y - Constants.GAME.HEIGHT / 2, this.x - 0);
+			this.x = Constants.GAME.BOUNDARY_RADIUS * Math.cos(angle);
+			this.y = Constants.GAME.HEIGHT / 2 + Constants.GAME.BOUNDARY_RADIUS * Math.sin(angle);
+		}
 	}
 
 	getData() {

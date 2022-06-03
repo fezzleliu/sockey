@@ -411,6 +411,33 @@ class Game {
       Constants.GAME.GOAL.HEIGHT * this.canvas.height
     );
 
+    // draw boundaries
+    this.ctx.lineWidth = 4 * this.scale;
+    // right boundary
+    this.ctx.strokeStyle = this.me.team === 1 ? "blue" : "red";
+    this.ctx.beginPath();
+    this.ctx.arc(
+      Constants.GAME.WIDTH * this.scale,
+      (Constants.GAME.HEIGHT / 2) * this.scale,
+      Constants.GAME.BOUNDARY_RADIUS * this.scale,
+      0,
+      2 * Math.PI
+    );
+    this.ctx.stroke();
+
+    // draw left boundary
+    this.ctx.strokeStyle = this.me.team === 1 ? "red" : "blue";
+    this.ctx.beginPath();
+    this.ctx.arc(
+      0,
+      (Constants.GAME.HEIGHT / 2) * this.scale,
+      Constants.GAME.BOUNDARY_RADIUS * this.scale,
+      0,
+      2 * Math.PI
+    );
+    this.ctx.stroke();
+
+    // draw players
     this.players.forEach(player => {
       if (player === this.me) return;
       player.draw(this.ctx, this.scale, this.me);
