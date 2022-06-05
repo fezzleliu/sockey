@@ -15,6 +15,7 @@ class Game {
 	ball: any;
 	started: boolean;
 	points: number[];
+	startTime: number;
 
 	constructor(onStart: () => void, id: string) {
 		this.teams = Array(Constants.GAME.NUM_TEAMS).fill(null).map(() => []);
@@ -28,6 +29,8 @@ class Game {
 		this.started = false;
 
 		this.points = [0, 0];
+
+		this.startTime = 0;
 	}
 	
 	get players() {
@@ -110,10 +113,13 @@ class Game {
 	}
 
 	loop() {
-		this.players.forEach(player => {
-			player.update();
-		});
-
+		const duration = (performance.now() - this.startTime) / 1000;
+		if (duration >= Constants.GAME.BEGIN_WAIT && duration <= Constants.GAME.TIME_LENGTH + Constants.GAME.BEGIN_WAIT) {
+			this.players.forEach(player => {
+				player.update();
+			});
+		}
+		
 		this.ball.update(this.players);
 
 		io.to(this.id).emit('update', this.players.map(player => player.getData()), this.ball.getData(), this.points);
@@ -142,6 +148,7 @@ class Game {
 
 	start() {
 		this.started = true;
+		this.startTime = performance.now();
 		
 		this.onStart();
 		io.to(this.id).emit('start', this.players.map(player => player.getData()));

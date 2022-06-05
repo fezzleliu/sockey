@@ -382,8 +382,7 @@ class Game {
     requestAnimationFrame(this.gameLoop.bind(this));
   }
 
-  gameLoop() {
-    requestAnimationFrame(this.gameLoop.bind(this));
+  gameLoop() {let continueLoop = true;
 
     // reset for redrawing
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -469,19 +468,24 @@ class Game {
     // update timer on the top
     const currentTime = performance ? performance.now() : Date.now();
     const elapsedTime = Math.min(
-      Math.max((currentTime - this.startTime) / 1000, Constants.GAME.BEGIN_WAIT),
+      Math.max((currentTime - this.startTime) / 1000 - Constants.GAME.BEGIN_WAIT, 0),
       Constants.GAME.TIME_LENGTH
     );
 
-    const minutesElapsed = Math.floor(elapsedTime / 60);
-    const minutesLeft = Math.floor(Constants.GAME.TIME_LENGTH / 60) - minutesElapsed - 1;
+		const left = Constants.GAME.TIME_LENGTH - elapsedTime;
 
-    const secondsElapsed = elapsedTime - minutesElapsed / 60;
-    const secondsLeft = Constants.GAME.TIME_LENGTH - minutesLeft * 60 - secondsElapsed;
+		if (left <= 0) {
+			continueLoop = false;
+			alert('game over');
+		}
+
+    const minutesLeft = Math.floor(left / 60);
+
+    const secondsLeft = left % 60;
 
     const timeLeft = minutesLeft.toString() + ":" + secondsLeft.toFixed(1).padStart(4, "0");
 
-    document.querySelector(".points .timer").innerHTML = timeLeft;
+    document.querySelector(".points .timer").innerHTML = timeLeft.toString();
 
     // update the mobile charger thingy
     if (this.charger && this.charging) {
@@ -499,6 +503,8 @@ class Game {
         .getElementById("charge-stop-second")
         .setAttribute("offset", `${Math.min(charge + 0.01, 100)}%`);
     }
+
+		if (continueLoop) requestAnimationFrame(this.gameLoop.bind(this));
   }
 }
 
