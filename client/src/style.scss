@@ -18,6 +18,7 @@
   align-items: center;
   font-size: 50px;
   z-index: 101;
+  background: white;
 
   .dots {
     position: relative;
@@ -113,36 +114,41 @@
   display: flex;
 }
 
-.points {
+.points-outer {
   width: 100%;
   position: fixed;
   left: 0;
   top: 0;
-  display: flex;
-  font-size: 30px;
-  font-weight: bold;
-  justify-content: center;
-  align-items: center;
-  font-family: "Comfortaa";
-  color: white;
-  user-select: none;
+  z-index: 10;
 
-  .left {
-    background: blue;
-    padding: 6px 10px;
-    border-radius: 10px 0 0 10px;
-  }
+  .points {
+		display: flex;
+		font-size: 30px;
+		font-weight: bold;
+		justify-content: center;
+		align-items: center;
+		font-family: "Space Mono", monospace;
+		color: white;
+		user-select: none;
+		position: relative;
 
-  .right {
-    background: red;
-    padding: 6px 10px;
-    border-radius: 0 10px 10px 0;
-  }
+    .left {
+			background: blue;
+      padding: 6px 10px;
+      border-radius: 10px 0 0 10px;
+    }
 
-  .timer {
-    background-color: grey;
-    padding: 0px 10px;
-    font-family: "Space Mono", monospace;
+    .right {
+      background: red;
+      padding: 6px 10px;
+      border-radius: 0 10px 10px 0;
+    }
+
+    .timer {
+      background-color: grey;
+      padding: 6px 10px;
+			height: 100%;
+    }
   }
 }
 
@@ -400,12 +406,12 @@ $triangle-size: 100px;
 
 .shoot {
   position: absolute;
-	width: 100px;
-	height: 112px;
+  width: 100px;
+  height: 112px;
   bottom: 30px;
   right: 30px;
 
-	display: none;
+  display: none;
 
   z-index: 10;
 }
