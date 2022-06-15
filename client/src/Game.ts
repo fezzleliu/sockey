@@ -229,6 +229,11 @@ class Game {
       document.querySelector("#countdown").classList.add("countdown");
     }, 2000);
 
+		if (this.me.team === 1) {
+			document.querySelector('.points-outer .points').classList.add('swap');
+		}
+
+		// setup mobile
     if (this.useMobile) this.mobileMode();
   }
 
@@ -372,8 +377,8 @@ class Game {
 
     if (this.points[0] !== points[0] || this.points[1] !== points[1]) {
       this.points = points;
-      document.querySelector(".points .left").innerHTML = points[0].toString();
-      document.querySelector(".points .right").innerHTML = points[1].toString();
+      document.querySelector(".points-outer .points .left").innerHTML = points[0].toString();
+      document.querySelector(".points-outer .points .right").innerHTML = points[1].toString();
     }
   }
 
@@ -485,7 +490,7 @@ class Game {
 
     const timeLeft = minutesLeft.toString() + ":" + secondsLeft.toFixed(1).padStart(4, "0");
 
-    document.querySelector(".points .timer").innerHTML = timeLeft.toString();
+    document.querySelector(".points-outer .points .timer").innerHTML = timeLeft.toString();
 
     // update the mobile charger thingy
     if (this.charger && this.charging) {
