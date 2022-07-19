@@ -93,7 +93,7 @@ class Game {
     this.addImages(images);
 
     // set up start screen
-    const form: HTMLFormElement = document.querySelector(".start-outer .outer .form");
+    const form: HTMLFormElement = (document.querySelector(".start-outer .outer .form") as HTMLFormElement);
 
     form.addEventListener("submit", e => {
       e.preventDefault();
@@ -116,7 +116,7 @@ class Game {
     ) {
       console.log("autostart");
       (document.querySelector(".start-outer .outer .form .name") as HTMLInputElement).value =
-        localStorage.getItem("autostart");
+        (localStorage.getItem("autostart") as string);
       setTimeout(
         () => (document.querySelector(".start-outer .outer .form .start") as HTMLInputElement).click(),
         1000
@@ -149,7 +149,7 @@ class Game {
 
   onPerson(people: number) {
 		// change the number of people in the loader
-    document.getElementById("waiting").innerHTML = `${people}/${Constants.GAME.NUM_TEAMS * Constants.GAME.TEAM_SIZE} joined`;
+    (document.getElementById("waiting") as HTMLDivElement).innerHTML = `${people}/${Constants.GAME.NUM_TEAMS * Constants.GAME.TEAM_SIZE} joined`;
   }
 
   onStart(players: InitPlayer[]) {
@@ -169,11 +169,11 @@ class Game {
     document.getElementsByClassName("waiting")[0].style.display = "none";
 
     // clear game div
-    document.getElementById("game").innerHTML = "";
+  	(document.getElementById("game") as HTMLDivElement).innerHTML = "";
 
 		// create canvas and add to dom, get context
-    const canvas = document.getElementById("game").appendChild(document.createElement("canvas"));
-    const ctx = canvas.getContext("2d");
+    const canvas = (document.getElementById("game") as HTMLDivElement).appendChild(document.createElement("canvas"));
+    const ctx: CanvasRenderingContext2D = (canvas.getContext("2d") as CanvasRenderingContext2D);
 
     this.canvas = canvas;
     this.ctx = ctx;
@@ -386,6 +386,20 @@ class Game {
     requestAnimationFrame(this.gameLoop.bind(this));
   }
 
+	endGame() {
+		const outcome = this.points[0] > this.points[1] ? 0 : this.points[0] < this.points[1] ? 1 : 2;
+
+		if (outcome === 1 || outcome === 0) {
+			document.querySelector('#end .outer .winner .outcome').innerText = outcome === this.me.team ? 'win!' : 'loose.';
+			document.querySelector('#end .outer .score .score').innerText = `${this.points[0]}-${this.points[1]}`;
+		} else {
+			document.querySelector('#end .outer .winner').innerText = 'Tie Game.';
+			document.querySelector('#end .outer .score').remove();
+		}
+
+		document.querySelector('#end').style.display = 'flex';
+	}
+
   gameLoop() {
     let continueLoop = true;
 
@@ -481,7 +495,6 @@ class Game {
 
     if (left <= 0) {
       continueLoop = false;
-      alert("game over");
     }
 
     const minutesLeft = Math.floor(left / 60);
@@ -510,6 +523,10 @@ class Game {
     }
 
     if (continueLoop) requestAnimationFrame(this.gameLoop.bind(this));
+
+		else {
+			this.endGame();
+		}
   }
 }
 

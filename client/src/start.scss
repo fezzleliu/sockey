@@ -6,6 +6,7 @@
 }
 
 $grey: #595959;
+$small-screen: 1000px;
 
 .start-outer {
 	background-color: white;
@@ -153,7 +154,14 @@ $grey: #595959;
           background-color: red;
         }
       }
+			
     }
+
+		@media screen and (max-width: $small-screen) {
+			.sockey {
+				transform: scale(.5) translateY(-75%);
+			}
+		}
 
     .btns {
       position: absolute;
@@ -203,6 +211,12 @@ $grey: #595959;
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
+		@media screen and (max-width: $small-screen) {
+			.players {
+				transform: translate(-50%, -50%) scale(.75) translateY(50%);
+			}
+		}
   }
 
   $modal-animation-length: 0.3s;

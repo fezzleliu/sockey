@@ -1,16 +1,18 @@
+type Nums = [number, number, number];
+
 class RGB {
 	r: number;
 	g: number;
 	b: number;
 	constructor(hex: string) {
-		const nums = hex.substring(1).match(/.{1,2}/g);
+		const nums: Nums = hex.substring(1).match(/.{1,2}/g);
 		this.r = parseInt(nums[0], 16);
 		this.g = parseInt(nums[1], 16);
 		this.b = parseInt(nums[2], 16);
 	}
 
 	fade(hex: string, between: number) {
-		const nums = hex.substring(1).match(/.{1,2}/g);
+		const nums: Nums = hex.substring(1).match(/.{1,2}/g);
 		let r: number | string = parseInt(nums[0], 16);
 		let g: number | string = parseInt(nums[1], 16);
 		let b: number | string = parseInt(nums[2], 16);
@@ -38,7 +40,7 @@ class RGB {
 	}
 
 	set(hex: string) {
-		const nums = hex.substring(1).match(/.{1,2}/g);
+		const nums: Nums = hex.substring(1).match(/.{1,2}/g);
 		this.r = parseInt(nums[0], 16);
 		this.g = parseInt(nums[1], 16);
 		this.b = parseInt(nums[2], 16);
