@@ -425,3 +425,55 @@ $triangle-size: 100px;
 
   z-index: 10;
 }
+
+#end {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	
+	z-index: 200;
+	backdrop-filter: blur(10px);
+
+	// display: flex;
+	justify-content: center;
+	align-items: center;
+
+	display: none;
+
+	.outer {
+		width: 45%;
+		height: 30vh;
+
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		flex-direction: column;
+
+		border-radius: 30px;
+		background-color: white;
+		box-shadow: 10px 10px 20px #888888;
+		font-family: "Comfortaa";
+
+		.title {
+			font-size: 30px;
+			font-weight: bold;
+			margin-bottom: 10px;
+		}
+
+		.winner {
+			font-size: 20px;
+			margin-bottom: 10px;
+		}
+
+		.score {
+			display: flex;
+
+			.score {
+				margin-left: 3px;
+			}
+		}
+	}
+}

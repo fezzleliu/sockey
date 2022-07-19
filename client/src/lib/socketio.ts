@@ -1,24 +1,25 @@
-import io, { Socket } from 'socket.io-client';
+import io, { Socket } from "socket.io-client";
 
-// @ts-ignore
-let socket: null | Socket = null;
+let socket: Socket;
 
 function connect(): Promise<Socket> {
-	return new Promise((resolve, reject) => {
-		if (socket === null) {
-			// @ts-ignore
-			socket = io(import.meta.env.DEV ? 'http://localhost:8081' : 'https://sockey-game.herokuapp.com');
-			socket.on('connect', () => {
-				console.log('connected');
-				resolve(socket);
-			});
-			socket.on('disconnect', () => {
-				console.log('disconnected');
-			});
-		} else {
-			resolve(socket);
-		}
-	});
+  return new Promise((resolve, reject) => {
+    if (!socket) {
+      socket = io(
+				// @ts-ignore
+        import.meta.env.DEV ? "http://localhost:8081" : "https://sockey-game.herokuapp.com"
+      );
+      socket.on("connect", () => {
+        console.log("connected");
+        resolve(socket);
+      });
+      socket.on("disconnect", () => {
+        console.log("disconnected");
+      });
+    } else {
+      resolve(socket);
+    }
+  });
 }
 
 export default connect;
