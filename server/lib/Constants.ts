@@ -12,7 +12,7 @@ const Constants = {
 			HEIGHT: 1 / 2.5,
 			WIDTH: 10,
 		},
-		TIME_LENGTH: 3 * 3, // in seconds (3 minutes)
+		TIME_LENGTH: 3 * 60, // in seconds (3 minutes)
 		BEGIN_WAIT: 5, // in seconds (5 seconds)
 		BOUNDARY_RADIUS: 350, // radius of the boundary that players cannot enter
 	},
