@@ -7,6 +7,7 @@ import io from './lib/Server';
 
 const chars: string[] = ('abcdefghijklmnopqrstuvwxyz' + 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '1234567890-').split('');
 
+
 class Game {
 	teams: Player[][]
 
@@ -113,7 +114,7 @@ class Game {
 	}
 
 	loop() {
-		const duration = (performance.now() - this.startTime) / 1000;
+		const duration = ((performance ? performance.now() : Date.now()) - this.startTime) / 1000;
 		if (duration >= Constants.GAME.BEGIN_WAIT && duration <= Constants.GAME.TIME_LENGTH + Constants.GAME.BEGIN_WAIT) {
 			this.players.forEach(player => {
 				player.update();
@@ -148,7 +149,7 @@ class Game {
 
 	start() {
 		this.started = true;
-		this.startTime = performance.now();
+		this.startTime = performance ? performance.now() : Date.now();
 		
 		this.onStart();
 		io.to(this.id).emit('start', this.players.map(player => player.getData()));
