@@ -114,7 +114,7 @@ class Game {
 	}
 
 	loop() {
-		const duration = ((performance ? performance.now() : Date.now()) - this.startTime) / 1000;
+		const duration = (Date.now() - this.startTime) / 1000;
 		if (duration >= Constants.GAME.BEGIN_WAIT && duration <= Constants.GAME.TIME_LENGTH + Constants.GAME.BEGIN_WAIT) {
 			this.players.forEach(player => {
 				player.update();
@@ -149,7 +149,7 @@ class Game {
 
 	start() {
 		this.started = true;
-		this.startTime = performance ? performance.now() : Date.now();
+		this.startTime = Date.now();
 		
 		this.onStart();
 		io.to(this.id).emit('start', this.players.map(player => player.getData()));
